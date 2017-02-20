@@ -30,7 +30,7 @@ class Events(object):
         return num
 
     @classmethod
-    def subscribe(cls, name, method, subscriber=None):
+    def subscribe(cls, name: str, method, subscriber = None) -> None:
         cls.records.add(Record(name, method, subscriber))
 
     @classmethod

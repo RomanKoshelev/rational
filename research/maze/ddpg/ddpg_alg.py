@@ -67,7 +67,7 @@ class DdpgAlgorithm(object):
                 if done:
                     break
 
-            Events.send('algorithm.train_episode_end', {
+            Events.send('algorithm.train_episode', {
                 'episode': self.episode,
                 'reward': reward,
                 'nrate': nrate,

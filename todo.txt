@@ -1,4 +1,6 @@
 MAZE:
+- prioritazed buffer expierence
+- batch normalization
 - reward for exploration (see pappers..)
 
 LATER:

@@ -4,9 +4,10 @@ from common.events import Events
 class Logger(object):
     def __init__(self):
         self.agent = None
+        self.subcribe()
 
     def subcribe(self):
-        Events.subscribe('algorithm.train_episode_end', Logger.on_algorithm_episode, self)
+        Events.subscribe('algorithm.train_episode', Logger.on_algorithm_episode, self)
         Events.subscribe('world.action', Logger.on_world_action, self)
 
     def on_algorithm_episode(self, info):
