@@ -73,22 +73,25 @@ class DdpgAlgorithm(object):
             })
 
     def eval(self, episodes, steps):
-        done = False
-        for e in range(episodes):
+        done = 0
+        reward = 0
+        for _ in range(episodes):
             s = self.world.reset()
-            reward = 0
-            for _ in range(steps):
+            for __ in range(steps):
                 a = self.actor.predict([s])[0]
-                s, r, done = self.world.step(a)
+                s, r, d = self.world.step(a)
                 reward += r
-                if done:
+                if d:
+                    done += 1
                     break
 
-            Events.send('algorithm.eval_episode', {
-                'episode': e,
-                'reward': reward,
-                'done': done
-            })
+        reward /= float(episodes)
+        done /= float(episodes)
+        Events.send('algorithm.eval', {
+            'ave_reward': reward,
+            'ave_done': done
+        })
+        return reward, done
 
     @staticmethod
     def _add_noise(a, n, nr) -> np.ndarray:

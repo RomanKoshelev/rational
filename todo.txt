@@ -1,6 +1,6 @@
 MAZE:
+- print train duration
 - test world 3d
-- print duration
 
 LATER:
 - prioritazed buffer expierence
@@ -10,7 +10,7 @@ LATER:
 ===============================================================
 
 DONE:
-+ eval during train
++ evaluated during train
 + print if done
 + add experiments and make one
 + printed agent coords

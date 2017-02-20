@@ -9,3 +9,8 @@ def linear_1_0(progress):
 
 def linear_05_00(progress):
     return _linear(progress, .5, .0)
+
+
+def constant_1(_):
+    return 1.
+
