@@ -1,8 +1,12 @@
-TODO:
-- remove .idea from git
-- print agent coords
+MAZE:
 
+LATER:
+- ..
+
+===============================================================
 
 DONE:
++ printed agent coords
++ removed .idea from git
 + project started
 + add to github

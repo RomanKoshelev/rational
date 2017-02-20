@@ -1,12 +1,13 @@
 import numpy as np
 
+from common.events import Events
 from reinforcement_learning import IWorld
 
 
 class TargetWorld(IWorld):
     def __init__(self):
         self.limit = np.array([60., 40.])
-        self.target = np.array([50., 30.])
+        self.target = np.array([10., 10.])
         self.agent = np.array([0., 0.])
         self._obs_dim = len(self._get_state())
         self._act_dim = 2
@@ -44,3 +45,7 @@ class TargetWorld(IWorld):
         self.agent += a
         self.agent = np.minimum(self.agent, self.limit)
         self.agent = np.maximum(self.agent, np.array([0., 0.]))
+        Events.send('world.action', {
+            'agent': self.agent,
+            'action': a
+        })
