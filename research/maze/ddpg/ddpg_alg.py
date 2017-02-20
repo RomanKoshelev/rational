@@ -12,7 +12,12 @@ from .ou_noise import OUNoise
 
 class DdpgAlgorithm(object):
     def __init__(self, config, session, world: IWorld, scope=''):
-        self.config = config
+        self.noise_theta = config['ddpg.noise_theta']
+        self.noise_sigma = config['ddpg.noise_sigma']
+        self.buffer_size = config['ddpg.buffer_size']
+        self.batch_size = config['ddpg.batch_size']
+        self.noise_rate_method = config['ddpg.noise_rate_method']
+        self.gamma = config['ddpg.gamma']
         self.world = world
         self.buffer = None
         with tf.variable_scope(scope):
@@ -29,14 +34,13 @@ class DdpgAlgorithm(object):
         return self.actor.predict([s])[0]
 
     def train(self, episodes, steps):
-        first_episode = self.episode + 1 if self.episode is not None else 0
         expl = self._create_exploration()
         done = False
 
         if self.buffer is None:
             self.buffer = self._create_buffer()
 
-        for self.episode in range(first_episode, episodes + 1):
+        for self.episode in range(episodes):
             s = self.world.reset()
 
             nrate = self._get_noise_rate(self.episode, episodes)
@@ -89,7 +93,7 @@ class DdpgAlgorithm(object):
             if done[i]:
                 y.append(r[i])
             else:
-                y.append(r[i] + self.config['ddpg.gamma'] * q[i])
+                y.append(r[i] + self.gamma * q[i])
         return np.reshape(y, (-1, 1))
 
     def _update_critic(self, y, s, a):
@@ -105,17 +109,15 @@ class DdpgAlgorithm(object):
         self.critic.target_train()
 
     def _get_batch(self):
-        batch = self.buffer.get_batch(self.config['ddpg.batch_size'])
+        batch = self.buffer.get_batch(self.batch_size)
         s, a, r, s2, done = zip(*batch)
         return s, a, r, s2, done
 
     def _create_exploration(self):
-        return OUNoise(self.world.act_dim, mu=0,
-                       sigma=self.config['ddpg.noise_sigma'],
-                       theta=self.config['ddpg.noise_theta'])
+        return OUNoise(self.world.act_dim, mu=0, sigma=self.noise_sigma, theta=self.noise_theta)
 
     def _get_noise_rate(self, episode, episodes):
-        return self.config['ddpg.noise_rate_method'](episode / float(episodes))
+        return self.noise_rate_method(episode / float(episodes))
 
     def _create_buffer(self):
-        return ReplayBuffer(self.config['ddpg.buffer_size'])
+        return ReplayBuffer(self.buffer_size)

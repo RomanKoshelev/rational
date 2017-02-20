@@ -35,19 +35,19 @@ class TestDdpg(unittest.TestCase):
     def test_default_config(self):
         config['train.episodes'] = 2000
         config['train.steps'] = 10
-        config['ddpg.buffer_size'] = 10 * 1000  # 10*1000
-        config['ddpg.actor_lr'] = 1e-4  # 1e-4
-        config['ddpg.critic_lr'] = 1e-3  # 1e-3
-        config['ddpg.actor_tau'] = 1e-3  # 1e-3
-        config['ddpg.critic_tau'] = 1e-3  # 1e-3
-        config['ddpg.noise_sigma'] = .5  # .05
-        config['ddpg.noise_theta'] = 0.15  # .15
+        config['ddpg.buffer_size'] = 10 * 1000
+        config['ddpg.actor_lr'] = 1e-4
+        config['ddpg.critic_lr'] = 1e-3
+        config['ddpg.actor_tau'] = 1e-3
+        config['ddpg.critic_tau'] = 1e-3
+        config['ddpg.noise_sigma'] = .5
+        config['ddpg.noise_theta'] = 0.15
         r, q = self.run_experiment(config)
         self.assertGreater(r, 90)
         self.assertGreater(q, 900)
 
     def test_buffer_size(self):
-        config['train.buffer_size'] = 1*1000
+        config['train.buffer_size'] = 2*1000
         r, q = self.run_experiment(config)
         self.assertGreater(r, 90)
         self.assertGreater(q, 800)
