@@ -13,7 +13,7 @@ from research.maze.worlds.target_world import TargetWorld
 class TestDdpg(unittest.TestCase):
     def test_random_world(self):
         Logger()
-        alg = DdpgAlgorithm(config, tf.Session(), RandomWorld())
+        alg = DdpgAlgorithm(config, RandomWorld())
         alg.train(10, 100)
         self.assertTrue(True)
 
@@ -22,30 +22,26 @@ class TestDdpg(unittest.TestCase):
         Logger()
         r, q = None, None
 
-        def store_rq(data):
+        episodes, steps = cfg['train.episodes'], cfg['train.steps']
+
+        def on_train_episode(data):
             nonlocal r, q
+            e = data['episode']
             r = data['reward']
             q = data['qmax']
+            if e % 10 == 0:
+                alg.eval(1, steps)
 
         with tf.Session():
-            Events.subscribe('algorithm.train_episode', store_rq)
+            Events.subscribe('algorithm.train_episode', on_train_episode)
             alg = DdpgAlgorithm(cfg, TargetWorld(config))
-            alg.train(cfg['train.episodes'], cfg['train.steps'])
+            alg.train(episodes, steps)
         return r, q
 
     def test_default_config(self):
-        config['train.episodes'] = 2000
-        config['train.steps'] = 10
-        config['ddpg.buffer_size'] = 10 * 1000
-        config['ddpg.actor_lr'] = 1e-4
-        config['ddpg.critic_lr'] = 1e-3
-        config['ddpg.actor_tau'] = 1e-3
-        config['ddpg.critic_tau'] = 1e-3
-        config['ddpg.noise_sigma'] = .5
-        config['ddpg.noise_theta'] = 0.15
         r, q = self.run_experiment(config)
         self.assertGreater(r, 90)
-        self.assertGreater(q, 900)
+        self.assertGreater(q, 800)
 
     def test_buffer_size(self):
         config['train.buffer_size'] = 2*1000  # 10 * 1000
@@ -54,7 +50,9 @@ class TestDdpg(unittest.TestCase):
         self.assertGreater(q, 800)
 
     def test_batch_size(self):
-        config['ddpg.batch_size'] = 256  # 128
+        config['train.episodes'] = 2000
+        config['train.buffer_size'] = 2*1000  # 10 * 1000
+        config['ddpg.batch_size'] = 1024  # 256! 128
         r, q = self.run_experiment(config)
         self.assertGreater(r, 90)
         self.assertGreater(q, 800)

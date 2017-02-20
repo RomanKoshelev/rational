@@ -7,19 +7,26 @@ class Logger(object):
         self.subcribe()
 
     def subcribe(self):
-        Events.subscribe('algorithm.train_episode', Logger.on_algorithm_episode, self)
+        Events.subscribe('algorithm.train_episode', Logger.on_train, self)
+        Events.subscribe('algorithm.eval_episode', Logger.on_eval, self)
         Events.subscribe('world.action', Logger.on_world_action, self)
 
-    def on_algorithm_episode(self, info):
-        print("%4d:\tnr:%.2f\t\tr:%+8.2f\tq:%+8.2f\txy:[%4.1f, %4.1f]\t%-6s" % (
+    def on_train(self, info):
+        print("\n%4d:\tnr:%.2f\t\tr:%+8.2f\tq:%+8.2f\txy:[%4.1f, %4.1f]" % (
             info['episode'],
             info['nrate'],
             info['reward'],
             info['qmax'],
             self.agent[0],
             self.agent[1],
-            'done' if info['done'] else '',
-        ))
+        ), end='')
+
+    # noinspection PyMethodMayBeStatic
+    def on_eval(self, info):
+        print("\teval:%+8.2f\t%-6s" % (
+            info['reward'],
+            'DONE' if info['done'] else '',
+        ), end='')
 
     def on_world_action(self, info):
         # self._print_action(info['action'])

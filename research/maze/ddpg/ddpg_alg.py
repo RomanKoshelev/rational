@@ -31,17 +31,14 @@ class DdpgAlgorithm(object):
 
         self.helper.initialize_variables()
 
-    def predict(self, s):
-        return self.actor.predict([s])[0]
-
     def train(self, episodes, steps):
         expl = OUNoise(self.world.act_dim, 0, self.noise_sigma, self.noise_theta)
         done = False
 
-        for episode in range(episodes):
+        for e in range(episodes):
             s = self.world.reset()
 
-            nrate = self.noise_rate_method(episode / float(episodes))
+            nrate = self.noise_rate_method(e / float(episodes))
             reward = 0
             qmax = []
 
@@ -68,10 +65,28 @@ class DdpgAlgorithm(object):
                     break
 
             Events.send('algorithm.train_episode', {
-                'episode': episode,
+                'episode': e,
                 'reward': reward,
                 'nrate': nrate,
                 'qmax': np.mean(qmax),
+                'done': done
+            })
+
+    def eval(self, episodes, steps):
+        done = False
+        for e in range(episodes):
+            s = self.world.reset()
+            reward = 0
+            for _ in range(steps):
+                a = self.actor.predict([s])[0]
+                s, r, done = self.world.step(a)
+                reward += r
+                if done:
+                    break
+
+            Events.send('algorithm.eval_episode', {
+                'episode': e,
+                'reward': reward,
                 'done': done
             })
 

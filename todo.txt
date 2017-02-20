@@ -1,15 +1,16 @@
 MAZE:
 - test world 3d
+- print duration
+
+LATER:
 - prioritazed buffer expierence
 - batch normalization
 - reward for exploration (see pappers..)
 
-LATER:
-- eval during train
-
 ===============================================================
 
 DONE:
++ eval during train
 + print if done
 + add experiments and make one
 + printed agent coords
