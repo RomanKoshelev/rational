@@ -1,4 +1,6 @@
 MAZE:
+- print if done
+- add experiments and make one
 
 LATER:
 - ..
