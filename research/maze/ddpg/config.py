@@ -2,26 +2,26 @@ from .noise_tools import linear_05_00
 
 config = {
     # actor
-    'alg.actor.h1': 400,
-    'alg.actor.h2': 300,
-    'alg.actor.l2': 0.0,
-    'alg.actor.lr': 1e-4,
-    'alg.actor.tau': 0.001,
+    'ddpg.actor.h1': 400,
+    'ddpg.actor.h2': 300,
+    'ddpg.actor.l2': 0.0,
+    'ddpg.actor.lr': 1e-4,
+    'ddpg.actor.tau': 0.001,
 
     # critic
-    'alg.critic.h1': 400,
-    'alg.critic.h2': 300,
-    'alg.critic.l2': 0.01,
-    'alg.critic.lr': 1e-3,
-    'alg.critic.tau': 0.001,
+    'ddpg.critic.h1': 400,
+    'ddpg.critic.h2': 300,
+    'ddpg.critic.l2': 0.01,
+    'ddpg.critic.lr': 1e-3,
+    'ddpg.critic.tau': 0.001,
 
-    # common
-    'alg.gamma': 0.99,  # FUTURE REWARD DECAY
+    # ruture reward decay
+    'ddpg.gamma': 0.99,
 
     # train
-    'alg.buffer_size': 100 * 1000,
-    'alg.batch_size': 128,
-    'alg.noise_sigma': .1,
-    'alg.noise_theta': .01,
-    'alg.noise_rate_method': linear_05_00,
+    'ddpg.buffer_size': 100 * 1000,
+    'ddpg.batch_size': 128,
+    'ddpg.noise_sigma': .1,
+    'ddpg.noise_theta': .01,
+    'ddpg.noise_rate_method': linear_05_00,
 }

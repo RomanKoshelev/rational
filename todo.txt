@@ -1,15 +1,14 @@
 MAZE:
-- add experiments and make one
-- print if done
-- eval during train
-
+- reward for exploration (see pappers..)
 
 LATER:
-- ..
+- eval during train
 
 ===============================================================
 
 DONE:
++ print if done
++ add experiments and make one
 + printed agent coords
 + removed .idea from git
 + project started

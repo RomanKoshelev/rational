@@ -89,7 +89,7 @@ class DdpgAlgorithm(object):
             if done[i]:
                 y.append(r[i])
             else:
-                y.append(r[i] + self.config['alg.gamma'] * q[i])
+                y.append(r[i] + self.config['ddpg.gamma'] * q[i])
         return np.reshape(y, (-1, 1))
 
     def _update_critic(self, y, s, a):
@@ -105,17 +105,17 @@ class DdpgAlgorithm(object):
         self.critic.target_train()
 
     def _get_batch(self):
-        batch = self.buffer.get_batch(self.config['alg.batch_size'])
+        batch = self.buffer.get_batch(self.config['ddpg.batch_size'])
         s, a, r, s2, done = zip(*batch)
         return s, a, r, s2, done
 
     def _create_exploration(self):
         return OUNoise(self.world.act_dim, mu=0,
-                       sigma=self.config['alg.noise_sigma'],
-                       theta=self.config['alg.noise_theta'])
+                       sigma=self.config['ddpg.noise_sigma'],
+                       theta=self.config['ddpg.noise_theta'])
 
     def _get_noise_rate(self, episode, episodes):
-        return self.config['alg.noise_rate_method'](episode / float(episodes))
+        return self.config['ddpg.noise_rate_method'](episode / float(episodes))
 
     def _create_buffer(self):
-        return ReplayBuffer(self.config['alg.buffer_size'])
+        return ReplayBuffer(self.config['ddpg.buffer_size'])

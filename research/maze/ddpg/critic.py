@@ -3,11 +3,11 @@ import tensorflow as tf
 
 class CriticNetwork(object):
     def __init__(self, config, sess, state_size, action_size):
-        self.h1 = config['alg.critic.h1']
-        self.h2 = config['alg.critic.h2']
-        self.l2 = config['alg.critic.l2']
-        self.lr = config['alg.critic.lr']
-        self.tau = config['alg.critic.tau']
+        self.h1 = config['ddpg.critic.h1']
+        self.h2 = config['ddpg.critic.h2']
+        self.l2 = config['ddpg.critic.l2']
+        self.lr = config['ddpg.critic.lr']
+        self.tau = config['ddpg.critic.tau']
 
         self.sess = sess
 

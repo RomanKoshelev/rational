@@ -35,14 +35,14 @@ class TargetWorld(IWorld):
 
     @property
     def _is_done(self):
-        return self._target_dist() < .1
+        return self._target_dist() < self.done_dist
 
     def _make_reward(self):
         dist = self._target_dist()
         return 10-dist + (1000 if self._is_done else 0)
 
     def _target_dist(self):
-        return np.sqrt(np.sum((self.agent - self.target) ** 2)) + 1e-10
+        return np.sqrt(np.sum((self.agent - self.target) ** 2))
 
     def _do_action(self, a):
         d = self.done_dist

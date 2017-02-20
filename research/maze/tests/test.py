@@ -18,17 +18,26 @@ class Test(unittest.TestCase):
         alg.train(10, 100)
         self.assertTrue(True)
 
-    def test_target_world(self):
-        # world
-        config['world.done_dist'] = .5
-        # alg
-        config['alg.buffer_size'] = 10*1000
-        config['alg.actor.lr'] = 1e-4
-        config['alg.critic.lr'] = 1e-3
+    @staticmethod
+    def run_experiment(cfg):
         log = Logger()
         log.subcribe()
-        alg = DdpgAlgorithm(config, tf.Session(), TargetWorld(config))
-        alg.train(2000, 10)
+        alg = DdpgAlgorithm(cfg, tf.Session(), TargetWorld(config))
+        alg.train(cfg['train.episodes'], cfg['train.steps'])
+
+    def test_target_world(self):
+        # train
+        config['train.episodes'] = 2000
+        config['train.steps'] = 10
+        # alg
+        config['ddpg.buffer_size'] = 10*1000  # 10*1000
+        config['ddpg.actor.lr'] = 1e-4  # 1e-4
+        config['ddpg.critic.lr'] = 1e-3  # 1e-3
+
+        config['ddpg.actor.tau'] = 1e-1  # 1e-3
+        config['ddpg.critic.tau'] = 1e-1  # 1e-3
+
+        self.run_experiment(config)
         self.assertTrue(True)
 
 
