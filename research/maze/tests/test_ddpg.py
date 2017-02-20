@@ -47,7 +47,13 @@ class TestDdpg(unittest.TestCase):
         self.assertGreater(q, 900)
 
     def test_buffer_size(self):
-        config['train.buffer_size'] = 2*1000
+        config['train.buffer_size'] = 2*1000  # 10 * 1000
+        r, q = self.run_experiment(config)
+        self.assertGreater(r, 90)
+        self.assertGreater(q, 800)
+
+    def test_batch_size(self):
+        config['ddpg.batch_size'] = 256  # 128
         r, q = self.run_experiment(config)
         self.assertGreater(r, 90)
         self.assertGreater(q, 800)

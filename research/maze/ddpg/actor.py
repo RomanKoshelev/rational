@@ -35,14 +35,13 @@ class ActorNetwork(object):
         })
 
     def target_predict(self, states):
-        return self.sess.run(self.target_out, feed_dict={
-            self.target_state: states
-        })
+        return self.target_out.eval({self.target_state: states}, self.sess)
 
     def target_train(self):
         self.sess.run(self.target_update)
 
-    def crate_actor_target_network(self, input_dim, weights):
+    def crate_actor_target_network(self, input_dim, weights) -> (
+            tf.Operation, tf.Operation, tf.Operation, tf.Operation):
         state = tf.placeholder(tf.float32, shape=[None, input_dim], name='state')
 
         ema = tf.train.ExponentialMovingAverage(decay=1 - self.tau)

@@ -17,42 +17,38 @@ class DdpgAlgorithm(object):
         self.buffer_size = config['ddpg.buffer_size']
         self.batch_size = config['ddpg.batch_size']
         self.noise_rate_method = config['ddpg.noise_rate_method']
+
         self.gamma = config['ddpg.gamma']
         self.world = world
-        self.buffer = None
+        self.buffer = ReplayBuffer(self.buffer_size)
+        self.helper = Helper(session, scope)
+
         with tf.variable_scope(scope):
             with tf.variable_scope('actor'):
                 self.actor = ActorNetwork(config, session, world.obs_dim, world.act_dim)
             with tf.variable_scope('critic'):
                 self.critic = CriticNetwork(config, session, world.obs_dim, world.act_dim)
 
-        self.episode = None
-        self.helper = Helper(session, scope)
         self.helper.initialize_variables()
 
     def predict(self, s):
         return self.actor.predict([s])[0]
 
     def train(self, episodes, steps):
-        expl = self._create_exploration()
+        expl = OUNoise(self.world.act_dim, 0, self.noise_sigma, self.noise_theta)
         done = False
 
-        if self.buffer is None:
-            self.buffer = self._create_buffer()
-
-        for self.episode in range(episodes):
+        for episode in range(episodes):
             s = self.world.reset()
 
-            nrate = self._get_noise_rate(self.episode, episodes)
+            nrate = self.noise_rate_method(episode / float(episodes))
             reward = 0
             qmax = []
 
-            if self.episode % 100 == 0:
-                expl.reset()
-
             for _ in range(steps):
                 # play
-                a = self._make_noisy_action(s, expl.noise(), nrate)
+                a = self.actor.predict([s])[0]
+                a = self._add_noise(a, expl.noise(), nrate)
                 s2, r, done = self.world.step(a)
                 self.buffer.add(s, a, r, s2, done)
                 s = s2
@@ -72,19 +68,16 @@ class DdpgAlgorithm(object):
                     break
 
             Events.send('algorithm.train_episode', {
-                'episode': self.episode,
+                'episode': episode,
                 'reward': reward,
                 'nrate': nrate,
                 'qmax': np.mean(qmax),
                 'done': done
             })
 
-    def _make_noisy_action(self, s, noise, noise_rate) -> np.ndarray:
-        def add_noise(a, n, k):
-            return (1 - k) * a + k * n
-        act = self.actor.predict([s])[0]
-        act = add_noise(act, noise, noise_rate)
-        return act
+    @staticmethod
+    def _add_noise(a, n, nr) -> np.ndarray:
+        return (1 - nr) * a + nr * n
 
     def _make_target(self, r, s2, done):
         q = self.critic.target_predict(s2, self.actor.target_predict(s2))
@@ -112,12 +105,3 @@ class DdpgAlgorithm(object):
         batch = self.buffer.get_batch(self.batch_size)
         s, a, r, s2, done = zip(*batch)
         return s, a, r, s2, done
-
-    def _create_exploration(self):
-        return OUNoise(self.world.act_dim, mu=0, sigma=self.noise_sigma, theta=self.noise_theta)
-
-    def _get_noise_rate(self, episode, episodes):
-        return self.noise_rate_method(episode / float(episodes))
-
-    def _create_buffer(self):
-        return ReplayBuffer(self.buffer_size)
