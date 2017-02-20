@@ -1,4 +1,4 @@
-from .noise_tools import linear_1_0
+from .noise_tools import constant_1
 
 config = {
     # actor
@@ -25,5 +25,5 @@ config = {
     # noise
     'ddpg.noise_sigma': .5,
     'ddpg.noise_theta': .15,
-    'ddpg.noise_rate_method': linear_1_0,
+    'ddpg.noise_rate_method': constant_1,
 }
