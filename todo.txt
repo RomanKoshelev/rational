@@ -1,7 +1,8 @@
 TODO:
-> add to github
+- remove .idea from git
 - print agent coords
 
 
 DONE:
 + project started
++ add to github
