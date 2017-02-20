@@ -1,0 +1,7 @@
+TODO:
+> add to github
+- print agent coords
+
+
+DONE:
++ project started
