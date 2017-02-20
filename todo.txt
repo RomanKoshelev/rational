@@ -1,6 +1,8 @@
 MAZE:
-- print if done
 - add experiments and make one
+- print if done
+- eval during train
+
 
 LATER:
 - ..

@@ -31,6 +31,7 @@ class DdpgAlgorithm(object):
     def train(self, episodes, steps):
         first_episode = self.episode + 1 if self.episode is not None else 0
         expl = self._create_exploration()
+        done = False
 
         if self.buffer is None:
             self.buffer = self._create_buffer()
@@ -70,7 +71,8 @@ class DdpgAlgorithm(object):
                 'episode': self.episode,
                 'reward': reward,
                 'nrate': nrate,
-                'qmax': np.mean(qmax)
+                'qmax': np.mean(qmax),
+                'done': done
             })
 
     def _make_noisy_action(self, s, noise, noise_rate) -> np.ndarray:

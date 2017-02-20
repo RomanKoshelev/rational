@@ -5,8 +5,9 @@ from reinforcement_learning import IWorld
 
 
 class TargetWorld(IWorld):
-    def __init__(self):
-        self.limit = np.array([60., 40.])
+    def __init__(self, config):
+        self.done_dist = config['world.done_dist']
+        self.limit = np.array([20., 20.])
         self.target = np.array([10., 10.])
         self.agent = np.array([0., 0.])
         self._obs_dim = len(self._get_state())
@@ -16,7 +17,7 @@ class TargetWorld(IWorld):
         self._do_action(a)
         return (self._get_state(),
                 self._make_reward(),
-                self._is_done())
+                self._is_done)
 
     def reset(self) -> np.ndarray:
         return self._get_state()
@@ -32,16 +33,21 @@ class TargetWorld(IWorld):
     def _get_state(self):
         return np.append(self.agent, self.target)
 
+    @property
     def _is_done(self):
-        return self.agent[0] == self.target[0] and self.agent[1] == self.target[1]
+        return self._target_dist() < .1
 
     def _make_reward(self):
-        dist = np.sqrt(np.sum((self.agent - self.target) ** 2))
-        return 1/max(dist, .01)
+        dist = self._target_dist()
+        return 10-dist + (1000 if self._is_done else 0)
+
+    def _target_dist(self):
+        return np.sqrt(np.sum((self.agent - self.target) ** 2)) + 1e-10
 
     def _do_action(self, a):
-        a = np.minimum(a, np.array([+1., +1.]))
-        a = np.maximum(a, np.array([-1., -1.]))
+        d = self.done_dist
+        a = np.minimum(a, np.array([+d, +d]))
+        a = np.maximum(a, np.array([-d, -d]))
         self.agent += a
         self.agent = np.minimum(self.agent, self.limit)
         self.agent = np.maximum(self.agent, np.array([0., 0.]))

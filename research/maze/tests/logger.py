@@ -13,13 +13,14 @@ class Logger(object):
     def on_algorithm_episode(self, info):
         if self.episode is None or self.episode % 10 == 0:
             self.print_header()
-        print("%4d:\tnr:%.2f\tr:%.1f\tq:%.1f\ta:[%2.0f, %2.0f]" % (
+        print("%4d:\tnr:%.2f\t\tr:%+8.2f\tq:%+8.2f\txy:[%4.1f, %4.1f]\t%-6s" % (
             info['episode'],
             info['nrate'],
             info['reward'],
             info['qmax'],
             self.agent[0],
             self.agent[1],
+            'done' if info['done'] else '',
         ))
 
     def on_world_action(self, info):

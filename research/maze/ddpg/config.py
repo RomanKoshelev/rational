@@ -5,14 +5,14 @@ config = {
     'alg.actor.h1': 400,
     'alg.actor.h2': 300,
     'alg.actor.l2': 0.0,
-    'alg.actor.lr': 0.0001,
+    'alg.actor.lr': 1e-4,
     'alg.actor.tau': 0.001,
 
     # critic
     'alg.critic.h1': 400,
     'alg.critic.h2': 300,
     'alg.critic.l2': 0.01,
-    'alg.critic.lr': 0.001,
+    'alg.critic.lr': 1e-3,
     'alg.critic.tau': 0.001,
 
     # common
