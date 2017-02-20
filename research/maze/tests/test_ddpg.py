@@ -32,7 +32,7 @@ class TestDdpg(unittest.TestCase):
         alg.train(cfg['train.episodes'], cfg['train.steps'])
         return r, q
 
-    def test_target_world_best(self):
+    def test_default_config(self):
         config['train.episodes'] = 2000
         config['train.steps'] = 10
         config['ddpg.buffer_size'] = 10 * 1000  # 10*1000
@@ -46,11 +46,11 @@ class TestDdpg(unittest.TestCase):
         self.assertGreater(r, 90)
         self.assertGreater(q, 900)
 
-    def test_target_world(self):
-        # config['train.episodes'] = 2000
+    def test_buffer_size(self):
+        config['train.buffer_size'] = 1*1000
         r, q = self.run_experiment(config)
         self.assertGreater(r, 90)
-        self.assertGreater(q, 900)
+        self.assertGreater(q, 800)
 
 
 if __name__ == '__main__':
