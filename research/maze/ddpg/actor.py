@@ -2,14 +2,14 @@ import tensorflow as tf
 
 
 class ActorNetwork(object):
-    def __init__(self, config, sess, state_size, action_size):
+    def __init__(self, config, state_size, action_size):
         self.h1 = config['ddpg.actor_h1']
         self.h2 = config['ddpg.actor_h2']
         self.l2 = config['ddpg.actor_l2']
         self.lr = config['ddpg.actor_lr']
         self.tau = config['ddpg.actor_tau']
 
-        self.sess = sess
+        self.sess = tf.get_default_session()
 
         with tf.variable_scope('master'):
             self.state, self.out, self.weights = self.create_actor_network(state_size, action_size)
@@ -24,18 +24,13 @@ class ActorNetwork(object):
         self.optimize = tf.train.AdamOptimizer(self.lr).apply_gradients(grads)
 
     def train(self, states, action_grads):
-        self.sess.run(self.optimize, feed_dict={
-            self.state: states,
-            self.action_gradient: action_grads
-        })
+        self.sess.run(self.optimize, {self.state: states, self.action_gradient: action_grads})
 
     def predict(self, states):
-        return self.sess.run(self.out, feed_dict={
-            self.state: states
-        })
+        return self.out.eval({self.state: states})
 
     def target_predict(self, states):
-        return self.target_out.eval({self.target_state: states}, self.sess)
+        return self.target_out.eval({self.target_state: states})
 
     def target_train(self):
         self.sess.run(self.target_update)

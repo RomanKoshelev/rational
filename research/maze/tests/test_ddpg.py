@@ -27,9 +27,10 @@ class TestDdpg(unittest.TestCase):
             r = data['reward']
             q = data['qmax']
 
-        Events.subscribe('algorithm.train_episode', store_rq)
-        alg = DdpgAlgorithm(cfg, tf.Session(), TargetWorld(config))
-        alg.train(cfg['train.episodes'], cfg['train.steps'])
+        with tf.Session():
+            Events.subscribe('algorithm.train_episode', store_rq)
+            alg = DdpgAlgorithm(cfg, TargetWorld(config))
+            alg.train(cfg['train.episodes'], cfg['train.steps'])
         return r, q
 
     def test_default_config(self):

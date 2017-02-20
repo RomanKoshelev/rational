@@ -4,9 +4,9 @@ import os
 
 
 class Helper(object):
-    def __init__(self, sess, scope):
-        self.sess = sess
+    def __init__(self, scope):
         self.scope = scope
+        self.sess = tf.get_default_session()
 
     def initialize_variables(self):
         self.sess.run(tf.variables_initializer(self._variables))

@@ -2,14 +2,14 @@ import tensorflow as tf
 
 
 class CriticNetwork(object):
-    def __init__(self, config, sess, state_size, action_size):
+    def __init__(self, config, state_size, action_size):
         self.h1 = config['ddpg.critic_h1']
         self.h2 = config['ddpg.critic_h2']
         self.l2 = config['ddpg.critic_l2']
         self.lr = config['ddpg.critic_lr']
         self.tau = config['ddpg.critic_tau']
 
-        self.sess = sess
+        self.sess = tf.get_default_session()
 
         with tf.variable_scope('master'):
             self.state, self.action, self.out, self.weights = \
@@ -19,14 +19,12 @@ class CriticNetwork(object):
             self.target_state, self.target_action, self.target_update, self.target_net, self.target_out = \
                 self.crate_critic_target_network(state_size, action_size, self.weights)
 
-        # TRAINING
         self.y = tf.placeholder(tf.float32, [None, 1], name='y')
         self.error = tf.reduce_mean(tf.square(self.y - self.out))
         self.weight_decay = tf.add_n([self.l2 * tf.nn.l2_loss(var) for var in self.weights])
         self.loss = self.error + self.weight_decay
         self.optimize = tf.train.AdamOptimizer(self.lr).minimize(self.loss)
 
-        # GRADIENTS for policy update
         self.action_grads = tf.gradients(self.out, self.action)
 
     def gradients(self, states, actions):
@@ -57,7 +55,8 @@ class CriticNetwork(object):
     def target_train(self):
         self.sess.run(self.target_update)
 
-    def crate_critic_target_network(self, input_dim, action_dim, net):
+    def crate_critic_target_network(self, input_dim, action_dim, net) -> (
+            tf.Operation, tf.Operation, tf.Operation, tf.Operation):
         state = tf.placeholder(tf.float32, shape=[None, input_dim], name='state')
         action = tf.placeholder(tf.float32, shape=[None, action_dim], name='action')
 

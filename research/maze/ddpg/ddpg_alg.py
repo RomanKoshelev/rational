@@ -11,7 +11,7 @@ from .ou_noise import OUNoise
 
 
 class DdpgAlgorithm(object):
-    def __init__(self, config, session, world: IWorld, scope=''):
+    def __init__(self, config, world: IWorld, scope=''):
         self.noise_theta = config['ddpg.noise_theta']
         self.noise_sigma = config['ddpg.noise_sigma']
         self.buffer_size = config['ddpg.buffer_size']
@@ -21,13 +21,13 @@ class DdpgAlgorithm(object):
         self.gamma = config['ddpg.gamma']
         self.world = world
         self.buffer = ReplayBuffer(self.buffer_size)
-        self.helper = Helper(session, scope)
+        self.helper = Helper(scope)
 
         with tf.variable_scope(scope):
             with tf.variable_scope('actor'):
-                self.actor = ActorNetwork(config, session, world.obs_dim, world.act_dim)
+                self.actor = ActorNetwork(config, world.obs_dim, world.act_dim)
             with tf.variable_scope('critic'):
-                self.critic = CriticNetwork(config, session, world.obs_dim, world.act_dim)
+                self.critic = CriticNetwork(config, world.obs_dim, world.act_dim)
 
         self.helper.initialize_variables()
 
