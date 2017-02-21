@@ -36,7 +36,7 @@ class Logger(Subscriber):
     def _on_eval(self, info):
         print("\te:%+8.2f\t%-6s" % (
             info['ave_reward'],
-            'DONE' if info['ave_done'] > .5 else '%.2f%%' % info['ave_done'],
+            'DONE' if info['ave_done'] > .5 else '%3.0f%%' % (info['ave_done']*100),
         ), end='')
 
     def _on_world_action(self, info):

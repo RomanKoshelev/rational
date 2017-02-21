@@ -1,4 +1,5 @@
 MAZE:
+- print log after the time is recieved, use text.table - for logging rec, header
 - test world 3d
 - add world render
 

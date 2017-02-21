@@ -32,7 +32,10 @@ class TestDdpg(unittest.TestCase):
             alg = DdpgAlgorithm(cfg, TargetWorld(config))
             alg.train(episodes, steps)
 
-            EventSystem.send('log', ["\n", "-" * 32, fields([['reward', "%.2f" % r], ['done', d]], -6)])
+            EventSystem.send('log', ["\n", "-" * 32, fields([
+                ['reward', "%.2f" % r],
+                ['done', "%.0f%%" % (d*100)]
+            ], -6)])
             self.assertGreater(r, 900)
             self.assertGreater(d, .75)
 
