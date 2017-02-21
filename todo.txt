@@ -1,6 +1,4 @@
 MAZE:
-- print log after the time is recieved, use text.table - for logging rec, header
-- test world 3d
 - add world render
 
 LATER:
@@ -11,6 +9,9 @@ LATER:
 ===============================================================
 
 DONE:
++ fixed world.reset error
++ tested world 3d
++ print log after the time is recieved, use text.table - for logging rec, header
 + used 'with' with logger and timer -- test it as Sibscriber
 + printed train duration
 + evaluated during train

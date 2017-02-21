@@ -8,17 +8,9 @@ from research.maze.ddpg.ddpg_alg import DdpgAlgorithm
 from research.maze.tests.config import config
 from research.maze.tests.train_logger import TrainLogger
 from research.maze.tests.timer import Timer
-from research.maze.worlds.random_world import RandomWorld
-from research.maze.worlds.target_world import TargetWorld
 
 
 class TestDdpg(unittest.TestCase):
-    def test_random_world(self):
-        TrainLogger()
-        alg = DdpgAlgorithm(config, RandomWorld())
-        alg.train(10, 100)
-        self.assertTrue(True)
-
     def run_experiment(self, cfg):
         with Timer(), TrainLogger(), tf.Session():
             r, d = 0, 0
@@ -29,12 +21,12 @@ class TestDdpg(unittest.TestCase):
                 r, d = alg.eval(10, steps)
 
             EventSystem.subscribe('algorithm.train_episode', on_train_episode)
-            alg = DdpgAlgorithm(cfg, TargetWorld(config))
+            alg = DdpgAlgorithm(cfg, config['world.class'](config))
             alg.train(episodes, steps)
 
-            EventSystem.send('log', ["\n", "-" * 32, fields([
-                ['reward', "%.2f" % r],
-                ['done', "%.0f%%" % (d*100)]
+            EventSystem.send('train.summary', ["\n", "-" * 32, fields([
+                ['Reward', "%.2f" % r],
+                ['Done', "%.0f%%" % (d*100)]
             ], -6)])
             self.assertGreater(r, 900)
             self.assertGreater(d, .75)
@@ -49,6 +41,22 @@ class TestDdpg(unittest.TestCase):
     def test_batch_size(self):
         config['train.buffer_size'] = 2 * 1000  # 10 * 1000
         config['ddpg.batch_size'] = 256  # 128
+        self.run_experiment(config)
+
+    def test_world_1d(self):
+        config['world.dim'] = 1
+        self.run_experiment(config)
+
+    def test_world_2d(self):
+        config['world.dim'] = 2
+        self.run_experiment(config)
+
+    def test_world_3d(self):
+        config['world.dim'] = 3
+        self.run_experiment(config)
+
+    def test_world_4d(self):
+        config['world.dim'] = 4
         self.run_experiment(config)
 
 

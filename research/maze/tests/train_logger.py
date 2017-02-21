@@ -2,27 +2,27 @@ from common.events import Subscriber
 from common.text_utils import TextTable
 
 
-# noinspection PyMethodMayBeStatic
 class TrainLogger(Subscriber):
     def __init__(self):
         self._subscribe('algorithm.train_episode', TrainLogger._on_train)
         self._subscribe('algorithm.eval', TrainLogger._on_eval)
         self._subscribe('world.action', TrainLogger._on_world_action)
         self._subscribe('timer', TrainLogger._on_timer)
-        self._subscribe('log', TrainLogger._on_log)
+        self._subscribe('train.summary', TrainLogger._on_summary)
         self._history = []
         self._record = {}
         self._table = TextTable([
             ['EPISODE'],
             ['REWARD', '%+.1f', 7],
             ['QMAX', '%+.1f', 7],
-            ['AGENT_COORDS', '%s', 12],
+            ['FINAL_AGENT_COORDS', '%s', 18],
             ['EVALUATION', '%+.1f'],
             ['TASK_DONE', '%s'],
             ['DURATION', '%.2f s'],
         ], vline=' '*3)
 
-    def _on_log(self, info):
+    # noinspection PyMethodMayBeStatic
+    def _on_summary(self, info):
         if isinstance(info, (list, tuple)):
             for i in info:
                 print(str(i))
@@ -45,7 +45,7 @@ class TrainLogger(Subscriber):
         self._update_table()
 
     def _on_world_action(self, info):
-        self._record['AGENT_COORDS'] = "[ %s ]" % ', '.join(['%3.0f' % c for c in info['agent']])
+        self._record['FINAL_AGENT_COORDS'] = "[ %s ]" % ', '.join(['%2d' % c for c in info['agent']])
         self._update_table()
 
     def _update_table(self):
