@@ -6,7 +6,7 @@ from research.maze.worlds.target_world import TargetWorld
 config['world.class'] = TargetWorld
 config['world.dim'] = 2
 config['world.size'] = 20
-config['world.agent_step'] = 2.
+config['world.agent_step'] = 1.5
 
 # task
 config['task.class'] = RandomTargetTask

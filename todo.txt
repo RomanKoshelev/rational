@@ -1,10 +1,14 @@
 MAZE:
-- add world render
+> add world render
+- add task with sarse reward
 
 LATER:
+- build train report
+- use dinamic learning rate
 - prioritazed buffer expierence
 - batch normalization
 - reward for exploration (see pappers..)
+
 
 ===============================================================
 
