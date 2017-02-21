@@ -18,8 +18,6 @@ class TargetWorld(IWorld):
         self._obs_dim = len(self._get_state())
         self._act_dim = self.dim
 
-        print(self._obs_dim, self._act_dim)
-
     def step(self, a: np.ndarray) -> (np.ndarray, float, bool):
         self._do_action(a)
         return (self._get_state(),
@@ -39,7 +37,7 @@ class TargetWorld(IWorld):
         return self._act_dim
 
     def _get_state(self):
-        return np.append(self.agent, self.target)
+        return self.target - self.agent
 
     @property
     def _is_done(self):

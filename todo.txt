@@ -1,5 +1,5 @@
 MAZE:
-- use random target
+- use random target via task object
 - add world render
 
 LATER:

@@ -34,6 +34,7 @@ class DdpgAlgorithm(object):
     def train(self, episodes, steps):
         expl = OUNoise(self.world.act_dim, 0, self.noise_sigma, self.noise_theta)
         done = False
+        state = None
 
         for e in range(episodes):
             s = self.world.reset()
@@ -60,6 +61,7 @@ class DdpgAlgorithm(object):
                 # statistic
                 reward += r
                 qmax.append(q)
+                state = s
 
                 if done:
                     break
@@ -69,6 +71,7 @@ class DdpgAlgorithm(object):
                 'reward': reward,
                 'nrate': nrate,
                 'qmax': np.mean(qmax),
+                'state': state,
                 'done': done
             })
 
@@ -92,7 +95,7 @@ class DdpgAlgorithm(object):
         EventSystem.send('algorithm.eval', {
             'ave_reward': reward,
             'ave_done': done,
-            'final_state': state,
+            'state': state,
         })
         return reward, done
 
