@@ -16,16 +16,16 @@ class TextTableTests(unittest.TestCase):
     def test_table_width(self):
         table = TextTable(vline='|')
         table.add_columns([
-            ['ONE', 5],
-            ['TWO', 3],
-            ['THREE', 4],
-            ['FOUR', 10, '%s', TextTable.ALIGN_RIGHT],
+            ['ONE', '%s', 5],
+            ['TWO', '%s', 3],
+            ['THREE', '%s', 4],
+            ['FOUR', '%s', 10, TextTable.ALIGN_LEFT],
             ['FIVE'],
-            ['SIX', 7, '%s', TextTable.ALIGN_CENTER],
-            ['SEVEN', 4, '%s', TextTable.ALIGN_LEFT],
+            ['SIX', '%s', 7, TextTable.ALIGN_CENTER],
+            ['SEVEN', '%s', 4, TextTable.ALIGN_LEFT],
         ])
         print(table.header)
-        self.assertEqual(table.header, "ONE  |TWO|THRE|      FOUR|FIVE|  SIX  |SEVE")
+        self.assertEqual(table.header, "  ONE|TWO|THRE|FOUR      |FIVE|  SIX  |SEVE")
 
     def test_table_records(self):
         table = TextTable()

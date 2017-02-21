@@ -6,7 +6,7 @@ from common.events import EventSystem
 from common.text_utils import fields
 from research.maze.ddpg.ddpg_alg import DdpgAlgorithm
 from research.maze.tests.config import config
-from research.maze.tests.logger import Logger
+from research.maze.tests.train_logger import TrainLogger
 from research.maze.tests.timer import Timer
 from research.maze.worlds.random_world import RandomWorld
 from research.maze.worlds.target_world import TargetWorld
@@ -14,13 +14,13 @@ from research.maze.worlds.target_world import TargetWorld
 
 class TestDdpg(unittest.TestCase):
     def test_random_world(self):
-        Logger()
+        TrainLogger()
         alg = DdpgAlgorithm(config, RandomWorld())
         alg.train(10, 100)
         self.assertTrue(True)
 
     def run_experiment(self, cfg):
-        with Timer(), Logger(), tf.Session():
+        with Timer(), TrainLogger(), tf.Session():
             r, d = 0, 0
             episodes, steps = cfg['train.episodes'], cfg['train.steps']
 
