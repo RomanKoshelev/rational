@@ -60,7 +60,7 @@ class TrainLogger(Subscriber):
         return True
 
     def _print_table(self):
-        if len(self._table.records) == 1 or len(self._table.records) % 30 == 0:
+        if len(self._table.records) == 1 or (len(self._table.records)-1) % 30 == 0:
             print("\n%s" % self._table.header)
         print(self._table.last_record)
 

@@ -10,7 +10,7 @@ config['world.agent_step'] = 2.
 
 # task
 config['task.class'] = RandomTargetTask
-config['task.done_dist'] = .5
+config['task.done_dist'] = 1.
 config['task.reward_done'] = 1000
 config['task.reward_dist'] = 10
 
