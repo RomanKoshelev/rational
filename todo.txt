@@ -1,5 +1,5 @@
 MAZE:
-- print train duration
+- use 'with' with logger and timer -- test it as Sibscriber
 - test world 3d
 
 LATER:
@@ -10,6 +10,7 @@ LATER:
 ===============================================================
 
 DONE:
++ printed train duration
 + evaluated during train
 + print if done
 + add experiments and make one

@@ -7,6 +7,7 @@ from research.maze.ddpg.ddpg_alg import DdpgAlgorithm
 from research.maze.ddpg.noise_tools import constant_1
 from research.maze.tests.config import config
 from research.maze.tests.logger import Logger
+from research.maze.tests.timer import Timer
 from research.maze.worlds.random_world import RandomWorld
 from research.maze.worlds.target_world import TargetWorld
 
@@ -19,6 +20,7 @@ class TestDdpg(unittest.TestCase):
         self.assertTrue(True)
 
     def run_experiment(self, cfg):
+        Timer()
         Logger()
         r, d = None, None
 
