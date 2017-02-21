@@ -1,1 +1,2 @@
-from .events import Events
+from .event_system import EventSystem
+from .subscriber import Subscriber

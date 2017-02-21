@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 
-from common.events import Events
+from common.events import EventSystem
 from reinforcement_learning import IWorld
 from .actor import ActorNetwork
 from .buffer import ReplayBuffer
@@ -64,7 +64,7 @@ class DdpgAlgorithm(object):
                 if done:
                     break
 
-            Events.send('algorithm.train_episode', {
+            EventSystem.send('algorithm.train_episode', {
                 'episode': e,
                 'reward': reward,
                 'nrate': nrate,
@@ -87,7 +87,7 @@ class DdpgAlgorithm(object):
 
         reward /= float(episodes)
         done /= float(episodes)
-        Events.send('algorithm.eval', {
+        EventSystem.send('algorithm.eval', {
             'ave_reward': reward,
             'ave_done': done
         })

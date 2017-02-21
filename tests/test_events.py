@@ -1,11 +1,11 @@
 import unittest
 
-from common.events import Events
+from common.events import EventSystem, Subscriber
 
 
-class Subscriber(object):
+class TestSubscriber(Subscriber):
     def __init__(self):
-        Events.subscribe('test_event', Subscriber.on_event, self)
+        self._subscribe('test_event', TestSubscriber.on_event)
 
     def on_event(self, data):
         print(self, data)
@@ -13,15 +13,15 @@ class Subscriber(object):
 
 class EventTests(unittest.TestCase):
     def test_object_subscription(self):
-        Events.unsubscribe_all()
-        _ = Subscriber()
-        num = Events.send('test_event', ([1, 2], "3"))
+        EventSystem.unsubscribe_all()
+        _ = TestSubscriber()
+        num = EventSystem.send('test_event', ([1, 2], "3"))
         self.assertEqual(num, 1)
 
     def test_lambda_subscription(self):
-        Events.unsubscribe_all()
-        Events.subscribe('test_event', lambda data: print(data))
-        num = Events.send('test_event', ([1, 2], "3"))
+        EventSystem.unsubscribe_all()
+        EventSystem.subscribe('test_event', lambda data: print(data))
+        num = EventSystem.send('test_event', ([1, 2], "3"))
         self.assertEqual(num, 1)
 
 

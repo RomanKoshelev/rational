@@ -1,15 +1,6 @@
-# --------------------------------------
-# Ornstein-Uhlenbeck Noise
-# Author: Flood Sung
-# Date: 2016.5.4
-# Reference: https://github.com/rllab/rllab/blob/master/rllab/exploration_strategies/ou_strategy.py
-# --------------------------------------
-
 import numpy as np
-import numpy.random as nr
 
 
-# noinspection PyArgumentList
 class OUNoise:
 
     def __init__(self, action_dimension, mu=0., sigma=.3, theta=0.15):
@@ -23,9 +14,10 @@ class OUNoise:
     def reset(self):
         self.state = np.ones(self.action_dimension) * self.mu
 
+    # noinspection PyArgumentList
     def noise(self):
-        x = self.state  # type: np.ndarray
-        dx = self.theta * (self.mu - x) + self.sigma * nr.randn(len(x))
+        x = self.state
+        dx = self.theta * (self.mu - x) + self.sigma * np.random.randn(len(x))
         self.state = x + dx
         return self.state
 

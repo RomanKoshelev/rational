@@ -1,6 +1,6 @@
 MAZE:
-- use 'with' with logger and timer -- test it as Sibscriber
 - test world 3d
+- add world rener
 
 LATER:
 - prioritazed buffer expierence
@@ -10,6 +10,7 @@ LATER:
 ===============================================================
 
 DONE:
++ used 'with' with logger and timer -- test it as Sibscriber
 + printed train duration
 + evaluated during train
 + print if done
