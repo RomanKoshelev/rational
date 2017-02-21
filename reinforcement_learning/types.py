@@ -1,6 +1,10 @@
 import numpy as np
 
 
+class ITask(object):
+    pass
+
+
 class IWorld(object):
     @property
     def obs_dim(self) -> int:

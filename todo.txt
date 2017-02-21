@@ -1,5 +1,4 @@
 MAZE:
-- use random target via task object
 - add world render
 
 LATER:
@@ -10,6 +9,7 @@ LATER:
 ===============================================================
 
 DONE:
++ used random target via task object
 + printed eval final state
 + fixed world.reset error
 + tested world 3d

@@ -37,13 +37,13 @@ class TrainLogger(Subscriber):
         self._record['EPISODE'] = info['episode']
         self._record['REWARD'] = info['reward']
         self._record['QMAX'] = info['qmax']
-        self._record['FINAL_TRAIN_STATE'] = "[ %s ]" % ', '.join(['%2.0f' % c for c in info['state']])
+        self._record['FINAL_TRAIN_STATE'] = self._format_state(info['state'])
         self._update_table()
 
     def _on_eval(self, info):
         self._record['EVALUATION'] = info['ave_reward']
         self._record['TASK_DONE'] = 'DONE' if info['ave_done'] == 1. else '%d%%' % (info['ave_done'] * 100)
-        self._record['FINAL_EVAL_STATE'] = "[ %s ]" % ', '.join(['%2.0f' % c for c in info['state']])
+        self._record['FINAL_EVAL_STATE'] = self._format_state(info['state'])
         self._update_table()
 
     def _update_table(self):
@@ -63,3 +63,7 @@ class TrainLogger(Subscriber):
         if len(self._table.records) == 1 or len(self._table.records) % 30 == 0:
             print("\n%s" % self._table.header)
         print(self._table.last_record)
+
+    @staticmethod
+    def _format_state(state):
+        return "[ %s ]" % ', '.join(['%3d' % c for c in state])
