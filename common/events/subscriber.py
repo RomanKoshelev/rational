@@ -5,7 +5,8 @@ class Subscriber(object):
     def __enter__(self):
         return self
 
-    def __exit__(self):
+    # noinspection PyUnusedLocal
+    def __exit__(self, *args, **kwargs):
         self._unsubcribe_all()
 
     def _subscribe(self, event: str, method: classmethod):

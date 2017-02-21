@@ -9,7 +9,7 @@ class Subscription(object):
 
 
 class EventSystem(object):
-    subscrioptions = set()
+    subscrioptions = []
 
     @classmethod
     def send(cls, event, data) -> int:
@@ -32,7 +32,7 @@ class EventSystem(object):
                   method: classmethod or staticmethod,
                   subscriber: object = None
                   ) -> None:
-        cls.subscrioptions.add(Subscription(event, method, subscriber))
+        cls.subscrioptions.append(Subscription(event, method, subscriber))
 
     @classmethod
     def unsubscribe(cls,
@@ -45,10 +45,11 @@ class EventSystem(object):
         def same(a, b):
             return b is None or a == b
 
-        for rec in cls.subscrioptions:
-            if same(rec.event, event) or same(rec.method, method) or same(rec.subscriber, subscriber):
-                cls.subscrioptions.remove(rec)
+        def specified(rec):
+            return same(rec.event, event) or same(rec.method, method) or same(rec.subscriber, subscriber)
+
+        cls.subscrioptions = list(filter(specified, cls.subscrioptions))
 
     @classmethod
     def unsubscribe_all(cls):
-        cls.subscrioptions = set()
+        cls.subscrioptions = []

@@ -3,6 +3,7 @@ import unittest
 import tensorflow as tf
 
 from common.events import EventSystem
+from common.text_utils import fields
 from research.maze.ddpg.ddpg_alg import DdpgAlgorithm
 from research.maze.tests.config import config
 from research.maze.tests.logger import Logger
@@ -19,7 +20,7 @@ class TestDdpg(unittest.TestCase):
         self.assertTrue(True)
 
     def run_experiment(self, cfg):
-        with tf.Session(), Timer(), Logger():
+        with Timer(), Logger(), tf.Session():
             r, d = None, None
             episodes, steps = cfg['train.episodes'], cfg['train.steps']
 
@@ -31,6 +32,7 @@ class TestDdpg(unittest.TestCase):
             alg = DdpgAlgorithm(cfg, TargetWorld(config))
             alg.train(episodes, steps)
 
+            EventSystem.send('log', ["-" * 32, fields([['reward', r], ['done', d]], -6)])
             self.assertGreater(r, 900)
             self.assertGreater(d, .75)
 
@@ -38,13 +40,12 @@ class TestDdpg(unittest.TestCase):
         self.run_experiment(config)
 
     def test_buffer_size(self):
-        config['train.buffer_size'] = 2*1000  # 10 * 1000
+        config['train.buffer_size'] = 2 * 1000  # 10 * 1000
         self.run_experiment(config)
 
     def test_batch_size(self):
-        config['train.episodes'] = 2000
-        config['train.buffer_size'] = 2*1000  # 10 * 1000
-        config['ddpg.batch_size'] = 1024  # 256! 128
+        config['train.buffer_size'] = 2 * 1000  # 10 * 1000
+        config['ddpg.batch_size'] = 256  # 128
         self.run_experiment(config)
 
 

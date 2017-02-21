@@ -1,6 +1,6 @@
 MAZE:
 - test world 3d
-- add world rener
+- add world render
 
 LATER:
 - prioritazed buffer expierence

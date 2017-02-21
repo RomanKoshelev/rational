@@ -1,6 +1,7 @@
 from common.events import Subscriber
 
 
+# noinspection PyMethodMayBeStatic
 class Logger(Subscriber):
     def __init__(self):
         self.agent = None
@@ -8,8 +9,15 @@ class Logger(Subscriber):
         self._subscribe('algorithm.eval', Logger._on_eval)
         self._subscribe('world.action', Logger._on_world_action)
         self._subscribe('timer', Logger._on_timer)
+        self._subscribe('log', Logger._on_log)
 
-    # noinspection PyMethodMayBeStatic
+    def _on_log(self, info):
+        if isinstance(info, (list, tuple)):
+            for i in info:
+                print(str(i))
+        else:
+            print(info)
+
     def _on_timer(self, times: dict):
         for k, v in times.items():
             print("\t%s:%4.2f" % (k, v), end='')
@@ -25,11 +33,10 @@ class Logger(Subscriber):
             self.agent[1],
         ), end='')
 
-    # noinspection PyMethodMayBeStatic
     def _on_eval(self, info):
         print("\te:%+8.2f\t%-6s" % (
             info['ave_reward'],
-            'DONE' if info['ave_done'] > .5 else '',
+            'DONE' if info['ave_done'] > .5 else '%.2f%%' % info['ave_done'],
         ), end='')
 
     def _on_world_action(self, info):
