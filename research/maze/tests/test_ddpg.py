@@ -21,7 +21,7 @@ class TestDdpg(unittest.TestCase):
 
     def run_experiment(self, cfg):
         with Timer(), Logger(), tf.Session():
-            r, d = None, None
+            r, d = 0, 0
             episodes, steps = cfg['train.episodes'], cfg['train.steps']
 
             def on_train_episode(_):
@@ -32,7 +32,7 @@ class TestDdpg(unittest.TestCase):
             alg = DdpgAlgorithm(cfg, TargetWorld(config))
             alg.train(episodes, steps)
 
-            EventSystem.send('log', ["-" * 32, fields([['reward', r], ['done', d]], -6)])
+            EventSystem.send('log', ["\n", "-" * 32, fields([['reward', "%.2f" % r], ['done', d]], -6)])
             self.assertGreater(r, 900)
             self.assertGreater(d, .75)
 
