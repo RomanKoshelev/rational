@@ -75,12 +75,14 @@ class DdpgAlgorithm(object):
     def eval(self, episodes, steps):
         done = 0
         reward = 0
+        state = None
         for _ in range(episodes):
             s = self.world.reset()
             for __ in range(steps):
                 a = self.actor.predict([s])[0]
                 s, r, d = self.world.step(a)
                 reward += r
+                state = s
                 if d:
                     done += 1
                     break
@@ -89,7 +91,8 @@ class DdpgAlgorithm(object):
         done /= float(episodes)
         EventSystem.send('algorithm.eval', {
             'ave_reward': reward,
-            'ave_done': done
+            'ave_done': done,
+            'final_state': state,
         })
         return reward, done
 

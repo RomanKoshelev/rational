@@ -6,7 +6,7 @@ from common.events import EventSystem
 from common.text_utils import fields
 from research.maze.ddpg.ddpg_alg import DdpgAlgorithm
 from research.maze.tests.config import config
-from research.maze.tests.train_logger import TrainLogger
+from research.maze.tests.logger import TrainLogger
 from research.maze.tests.timer import Timer
 
 

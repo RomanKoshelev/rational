@@ -1,6 +1,5 @@
 import numpy as np
 
-from common.events import EventSystem
 from reinforcement_learning import IWorld
 
 
@@ -59,7 +58,3 @@ class TargetWorld(IWorld):
         self.agent += a
         self.agent = np.minimum(self.agent, self.limit)
         self.agent = np.maximum(self.agent, np.zeros((self.dim,)))
-        EventSystem.send('world.action', {
-            'agent': self.agent,
-            'action': a
-        })

@@ -1,4 +1,5 @@
 MAZE:
+- use random target
 - add world render
 
 LATER:
@@ -9,6 +10,7 @@ LATER:
 ===============================================================
 
 DONE:
++ printed eval final state
 + fixed world.reset error
 + tested world 3d
 + print log after the time is recieved, use text.table - for logging rec, header
