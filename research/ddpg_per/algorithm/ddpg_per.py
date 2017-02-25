@@ -3,24 +3,23 @@ import tensorflow as tf
 
 from common.events import EventSystem
 from reinforcement_learning import IWorld
+from .experience_memory import ExperienceMemory
 from .actor import ActorNetwork
-from .buffer import ReplayBuffer
 from .critic import CriticNetwork
 from .store_helper import StoreHelper
 from .ou_noise import OUNoise
 
 
-class DdpgAlgorithm(object):
+class DdpgPer(object):
     def __init__(self, config, world: IWorld, scope=''):
         self.noise_theta = config['ddpg.noise_theta']
         self.noise_sigma = config['ddpg.noise_sigma']
-        self.buffer_size = config['ddpg.buffer_size']
         self.batch_size = config['ddpg.batch_size']
         self.noise_rate_method = config['ddpg.noise_rate_method']
 
         self.gamma = config['ddpg.gamma']
         self.world = world
-        self.buffer = ReplayBuffer(self.buffer_size)
+        self.buffer = ExperienceMemory(config['ddpg.buffer_size'])
         self.helper = StoreHelper(scope)
 
         with tf.variable_scope(scope):
@@ -36,10 +35,10 @@ class DdpgAlgorithm(object):
         done = False
         state = None
 
-        for e in range(episodes):
+        for ep in range(episodes):
             s = self.world.reset()
 
-            nrate = self.noise_rate_method(e / float(episodes))
+            nrate = self.noise_rate_method(ep / float(episodes))
             reward = 0
             qmax = []
 
@@ -48,26 +47,27 @@ class DdpgAlgorithm(object):
                 a = self.actor.predict([s])[0]
                 a = self._add_noise(a, expl.noise(), nrate)
                 s2, r, done = self.world.step(a)
-                self.buffer.add(s, a, r, s2, done)
+                self.buffer.add(r, (s, a, r, s2, done))
                 s = s2
 
                 # learn
-                bs, ba, br, bs2, bd = self._get_batch()
-                y = self._make_target(br, bs2, bd)
+                idx, bs, ba, br, bs2, bd = self._get_batch()
+                y, qold = self._make_target(br, bs2, bd)
                 q = self._update_critic(y, bs, ba)
+                self._update_buffer(idx, q, qold)
                 self._update_actor(bs)
                 self._update_target_networks()
 
                 # statistic
                 reward += r
-                qmax.append(q)
+                qmax.append(np.amax(q))
                 state = s
 
                 if done:
                     break
 
             EventSystem.send('algorithm.train_episode', {
-                'episode': e,
+                'episode': ep,
                 'reward': reward,
                 'nrate': nrate,
                 'qmax': np.mean(qmax),
@@ -103,19 +103,19 @@ class DdpgAlgorithm(object):
     def _add_noise(a, n, nr) -> np.ndarray:
         return (1 - nr) * a + nr * n
 
-    def _make_target(self, r, s2, done):
-        q = self.critic.target_predict(s2, self.actor.target_predict(s2))
+    def _make_target(self, r, s, done):
+        q = self.critic.target_predict(s, self.actor.target_predict(s))
         y = []
-        for i in range(len(s2)):
+        for i in range(len(s)):
             if done[i]:
                 y.append(r[i])
             else:
                 y.append(r[i] + self.gamma * q[i])
-        return np.reshape(y, (-1, 1))
+        return np.reshape(y, (-1, 1)), np.reshape(q, (-1, 1))
 
     def _update_critic(self, y, s, a):
         q, _ = self.critic.train(y, s, a)
-        return np.amax(q)
+        return q
 
     def _update_actor(self, s):
         grads = self.critic.gradients(s, self.actor.predict(s))
@@ -127,5 +127,11 @@ class DdpgAlgorithm(object):
 
     def _get_batch(self):
         batch = self.buffer.get_batch(self.batch_size)
-        s, a, r, s2, done = zip(*batch)
-        return s, a, r, s2, done
+        idx, (s, a, r, s2, done) = zip(*batch)
+        return idx, s, a, r, s2, done
+
+    def _update_buffer(self, idx, q1, q2):
+        assert np.shape(q1) == np.shape(q2)
+        err = np.abs(q1-q2)
+        for i in idx:
+            self.buffer.update(i, err[i])

@@ -5,7 +5,7 @@ import tensorflow as tf
 from common.events import EventSystem
 from common.text_utils import fields
 from research.ddpg.config import config
-from research.ddpg.algorithm.ddpg_alg import DdpgAlgorithm
+from research.ddpg.algorithm.ddpg import Ddpg
 from research.ddpg.utils.logger import TrainLogger
 from research.ddpg.utils.timer import Timer
 
@@ -22,7 +22,7 @@ class Test_DDPG(unittest.TestCase):
                 r, d = alg.eval(10, steps)
 
             EventSystem.subscribe('algorithm.train_episode', on_train_episode)
-            alg = DdpgAlgorithm(cfg, config['world.class'](config))
+            alg = Ddpg(cfg, config['world.class'](config))
             alg.train(episodes, steps)
 
             EventSystem.send('train.summary', ["\n", "-" * 32, fields([

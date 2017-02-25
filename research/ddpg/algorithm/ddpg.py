@@ -10,7 +10,7 @@ from .store_helper import StoreHelper
 from .ou_noise import OUNoise
 
 
-class DdpgAlgorithm(object):
+class Ddpg(object):
     def __init__(self, config, world: IWorld, scope=''):
         self.noise_theta = config['ddpg.noise_theta']
         self.noise_sigma = config['ddpg.noise_sigma']
