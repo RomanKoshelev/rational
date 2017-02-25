@@ -4,13 +4,14 @@ import tensorflow as tf
 
 from common.events import EventSystem
 from common.text_utils import fields
-from .config import config
-from .algorithm.ddpg_alg import DdpgAlgorithm
-from .utils.logger import TrainLogger
-from .utils.timer import Timer
+from research.ddpg.config import config
+from research.ddpg.algorithm.ddpg_alg import DdpgAlgorithm
+from research.ddpg.utils.logger import TrainLogger
+from research.ddpg.utils.timer import Timer
 
 
-class TestDdpg(unittest.TestCase):
+# noinspection PyPep8Naming
+class Test_DDPG(unittest.TestCase):
     def run_experiment(self, cfg):
         with Timer(), TrainLogger(), tf.Session():
             r, d = 0, 0
