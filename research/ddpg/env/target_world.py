@@ -1,7 +1,7 @@
 import numpy as np
 
 from reinforcement_learning import IWorld
-from research.maze.worlds.target_task import TargetTask
+from research.ddpg.env.target_task import TargetTask
 
 
 class TargetWorld(IWorld):

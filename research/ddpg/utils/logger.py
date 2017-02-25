@@ -42,7 +42,7 @@ class TrainLogger(Subscriber):
 
     def _on_eval(self, info):
         self._record['EVALUATION'] = info['ave_reward']
-        self._record['TASK_DONE'] = 'DONE' if info['ave_done'] == 1. else '%d%%' % (info['ave_done'] * 100)
+        self._record['TASK_DONE'] = 'DONE' if info['ave_done'] > .5 else '%d%%' % (info['ave_done'] * 100)
         self._record['FINAL_EVAL_STATE'] = self._format_state(info['state'])
         self._update_table()
 

@@ -6,7 +6,7 @@ from reinforcement_learning import IWorld
 from .actor import ActorNetwork
 from .buffer import ReplayBuffer
 from .critic import CriticNetwork
-from .helper import Helper
+from .store_helper import StoreHelper
 from .ou_noise import OUNoise
 
 
@@ -21,7 +21,7 @@ class DdpgAlgorithm(object):
         self.gamma = config['ddpg.gamma']
         self.world = world
         self.buffer = ReplayBuffer(self.buffer_size)
-        self.helper = Helper(scope)
+        self.helper = StoreHelper(scope)
 
         with tf.variable_scope(scope):
             with tf.variable_scope('actor'):

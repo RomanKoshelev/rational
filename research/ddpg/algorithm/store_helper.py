@@ -3,7 +3,7 @@ import pickle
 import os
 
 
-class Helper(object):
+class StoreHelper(object):
     def __init__(self, scope):
         self.scope = scope
         self.sess = tf.get_default_session()

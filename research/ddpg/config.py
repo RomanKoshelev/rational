@@ -1,6 +1,6 @@
-from research.maze.ddpg.config import config
-from research.maze.worlds.target_task import RandomTargetTask
-from research.maze.worlds.target_world import TargetWorld
+from research.ddpg.algorithm.config import config
+from research.ddpg.env.target_task import RandomTargetTask
+from research.ddpg.env.target_world import TargetWorld
 
 # world
 config['world.class'] = TargetWorld
@@ -15,5 +15,5 @@ config['task.reward_done'] = 1000
 config['task.reward_dist'] = 10
 
 # train
-config['train.episodes'] = 2000
+config['train.episodes'] = 3000
 config['train.steps'] = 10

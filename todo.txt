@@ -1,11 +1,11 @@
-MAZE:
-> add world render
-- add task with sarse reward
+TODO:
+- PER prioritized expierence replay
 
 LATER:
+- add world render
+- add task with sparse reward
 - build train report
 - use dinamic learning rate
-- prioritazed buffer expierence
 - batch normalization
 - reward for exploration (see pappers..)
 
