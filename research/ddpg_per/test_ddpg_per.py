@@ -31,7 +31,7 @@ class TestDddpgPer(TestDdpg):
 
     def test_world_3d(self):
         config['world.dim'] = 3
-        config['per.degree'] = .3  # 0.6
+        config['per.degree'] = .6  # 0.6
         self.run_experiment(config)
 
     def test_world_4d(self):

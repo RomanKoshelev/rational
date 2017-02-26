@@ -1,5 +1,5 @@
 TODO:
-> PER prioritized expierence replay
+- compare PER vs Uniform
 
 LATER:
 - add world render
@@ -13,6 +13,7 @@ LATER:
 ===============================================================
 
 DONE:
++ implemented PER prioritized expierence replay
 + fix expl in ddpg
 + used random target via task object
 + printed eval final state
