@@ -66,4 +66,4 @@ class TrainLogger(Subscriber):
 
     @staticmethod
     def _format_state(state):
-        return "[%s]" % ','.join(['%+3d' % c if abs(c) > .5 else '  0' for c in state])
+        return "[%s]" % ','.join(['%+3d' % c if abs(c) > .75 else '  _' for c in state])

@@ -12,28 +12,16 @@ class DdpgPer(Ddpg):
 
     def train(self, episodes, steps):
         self._init_buffer()
+        self._do_train(episodes, steps)
 
-        for e in range(episodes):
-            state = self.world.reset()
-            reward = 0
-            done = False
-            qmax = []
-
-            for _ in range(steps):
-                if not done:
-                    state, r, done = self._train_step(state)
-                    reward += r
-
-                idx, bs, ba, br, bs2, bd = self._get_batch()
-                y, qold = self._make_target(br, bs2, bd)
-                q = self._update_critic(y, bs, ba)
-                self._update_actor(bs)
-                self._update_target_networks()
-                self._update_buffer(idx, q, qold)
-
-                qmax.append(np.amax(q))
-
-            self._send_train_event(e, state, reward, done, qmax)
+    def _learn(self):
+        idx, bs, ba, br, bs2, bd = self._get_batch()
+        y, qold = self._make_target(br, bs2, bd)
+        q = self._update_critic(y, bs, ba)
+        self._update_actor(bs)
+        self._update_target_networks()
+        self._update_buffer(idx, q, qold)
+        return q
 
     def _make_target(self, r, s, done):
         q = self.critic.target_predict(s, self.actor.target_predict(s))
