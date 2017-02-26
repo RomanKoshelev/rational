@@ -1,6 +1,5 @@
 import numpy as np
 
-from common.events import EventSystem
 from reinforcement_learning import IWorld
 from research.ddpg.algorithm.ddpg import Ddpg
 from .experience_memory import ExperienceMemory
@@ -14,19 +13,16 @@ class DdpgPer(Ddpg):
     def train(self, episodes, steps):
         self._init_buffer()
 
-        for ep in range(episodes):
-            state = s = self.world.reset()
+        for e in range(episodes):
+            state = self.world.reset()
             reward = 0
             done = False
             qmax = []
 
             for _ in range(steps):
                 if not done:
-                    a = self.predict(s)
-                    a = self._add_noise(a, 1.)
-                    s, r, done = self.world.step(a)
+                    state, r, done = self._train_step(state)
                     reward += r
-                    state = s
 
                 idx, bs, ba, br, bs2, bd = self._get_batch()
                 y, qold = self._make_target(br, bs2, bd)
@@ -34,15 +30,10 @@ class DdpgPer(Ddpg):
                 self._update_actor(bs)
                 self._update_target_networks()
                 self._update_buffer(idx, q, qold)
+
                 qmax.append(np.amax(q))
 
-            EventSystem.send('algorithm.train_episode', {
-                'episode': ep,
-                'reward': reward,
-                'qmax': np.mean(qmax),
-                'state': state,
-                'done': done
-            })
+            self._send_train_event(e, state, reward, done, qmax)
 
     def _make_target(self, r, s, done):
         q = self.critic.target_predict(s, self.actor.target_predict(s))
@@ -62,10 +53,11 @@ class DdpgPer(Ddpg):
         for i in range(self.buffer_size):
             a = self.expl.noise()
             s2, r, done = self.world.step(a)
-            error = np.abs(r)
-            sample = (s, a, r, s2, done)
-            self.buffer.add(error, sample)
+            self._add_to_buffer(s, a, r, s2, done)
             s = s2
+
+    def _add_to_buffer(self, s, a, r, s2, done):
+        self.buffer.add(np.abs(r), (s, a, r, s2, done))
 
     def _update_buffer(self, idx, q1, q2):
         assert np.shape(q1) == np.shape(q2)

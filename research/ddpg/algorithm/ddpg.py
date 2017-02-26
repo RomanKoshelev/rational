@@ -36,18 +36,14 @@ class Ddpg(object):
 
     def train(self, episodes, steps):
         for e in range(episodes):
-            state = s = self.world.reset()
+            state = self.world.reset()
             reward = 0
             done = False
             qmax = []
 
             for _ in range(steps):
                 if not done:
-                    a = self.predict(s)
-                    a = self._add_noise(a, 1.)
-                    s2, r, done = self.world.step(a)
-                    self.buffer.add(s, a, r, s2, done)
-                    state = s = s2
+                    state, r, done = self._train_step(state)
                     reward += r
 
                 bs, ba, br, bs2, bd = self._get_batch()
@@ -55,15 +51,10 @@ class Ddpg(object):
                 q = self._update_critic(y, bs, ba)
                 self._update_actor(bs)
                 self._update_target_networks()
+
                 qmax.append(np.amax(q))
 
-            EventSystem.send('algorithm.train_episode', {
-                'episode': e,
-                'reward': reward,
-                'qmax': np.mean(qmax),
-                'state': state,
-                'done': done
-            })
+            self._send_train_event(e, state, reward, done, qmax)
 
     def eval(self, episodes, steps):
         done = 0
@@ -89,15 +80,16 @@ class Ddpg(object):
         })
         return reward, done
 
-    def _add_noise(self, a, nr) -> np.ndarray:
-        n = self.expl.noise()
-        # return (1 - nr) * a + nr * n
-        return a + nr * n
+    def _train_step(self, s):
+        a = self.predict(s) + self.expl.noise()
+        s2, r, done = self.world.step(a)
+        self._add_to_buffer(s, a, r, s2, done)
+        return s2, r, done
 
-    def _make_target(self, r, s2, done):
-        q = self.critic.target_predict(s2, self.actor.target_predict(s2))
+    def _make_target(self, r, s, done):
+        q = self.critic.target_predict(s, self.actor.target_predict(s))
         y = []
-        for i in range(len(s2)):
+        for i in range(len(s)):
             if done[i]:
                 y.append(r[i])
             else:
@@ -120,3 +112,16 @@ class Ddpg(object):
         batch = self.buffer.get_batch(self.batch_size)
         s, a, r, s2, done = zip(*batch)
         return s, a, r, s2, done
+
+    def _add_to_buffer(self, s, a, r, s2, done):
+        self.buffer.add(s, a, r, s2, done)
+
+    @staticmethod
+    def _send_train_event(e, state, reward, done, qmax):
+        EventSystem.send('algorithm.train_episode', {
+            'episode': e,
+            'reward': reward,
+            'qmax': np.mean(qmax),
+            'state': state,
+            'done': done
+        })

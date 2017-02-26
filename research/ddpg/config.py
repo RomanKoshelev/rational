@@ -26,6 +26,5 @@ config['task.reward_done'] = 1000
 config['task.reward_dist'] = 10
 
 # train
-config['train.episodes'] = 2000
+config['train.episodes'] = 1000
 config['train.steps'] = 10
-

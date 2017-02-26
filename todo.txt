@@ -1,4 +1,5 @@
 TODO:
+- refactor train
 - compare PER vs Uniform
 
 LATER:
@@ -13,6 +14,7 @@ LATER:
 ===============================================================
 
 DONE:
++ fixed PER error -- add new samples
 + implemented PER prioritized expierence replay
 + fix expl in ddpg
 + used random target via task object
