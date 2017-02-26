@@ -9,48 +9,36 @@ from .experience_memory import ExperienceMemory
 class DdpgPer(Ddpg):
     def __init__(self, config, world: IWorld, scope=''):
         super().__init__(config, world, scope)
-        self.buffer = ExperienceMemory(self.buffer_size)
+        self.buffer = ExperienceMemory(self.buffer_size, config['per.degree'])
 
     def train(self, episodes, steps):
-        done = False
-        state = None
-
         self._init_buffer()
 
         for ep in range(episodes):
-            s = self.world.reset()
-
-            nrate = self.noise_rate_method(ep / float(episodes))
+            state = s = self.world.reset()
             reward = 0
+            done = False
             qmax = []
 
             for _ in range(steps):
-                # play
-                a = self.predict(s)
-                a = self._add_noise(a, nrate)
-                s2, r, done = self.world.step(a)
-                s = s2
+                if not done:
+                    a = self.predict(s)
+                    a = self._add_noise(a, 1.)
+                    s, r, done = self.world.step(a)
+                    reward += r
+                    state = s
 
-                # learn
                 idx, bs, ba, br, bs2, bd = self._get_batch()
                 y, qold = self._make_target(br, bs2, bd)
                 q = self._update_critic(y, bs, ba)
-                self._update_buffer(idx, q, qold)
                 self._update_actor(bs)
                 self._update_target_networks()
-
-                # statistic
-                reward += r
+                self._update_buffer(idx, q, qold)
                 qmax.append(np.amax(q))
-                state = s
-
-                if done:
-                    break
 
             EventSystem.send('algorithm.train_episode', {
                 'episode': ep,
                 'reward': reward,
-                'nrate': nrate,
                 'qmax': np.mean(qmax),
                 'state': state,
                 'done': done

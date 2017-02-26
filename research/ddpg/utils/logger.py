@@ -15,11 +15,11 @@ class TrainLogger(Subscriber):
             # ['TRAIN_FINAL_STATE', '%s', 18],
             # ['REWARD', '%+.1f', 7],
             ['TRAIN_Q_MAX', '%+.1f'],
-            ['EVAL_FINAL_STATE', '%s', 18],
+            ['EVAL_FINAL_STATE_SAMPLE', '%s'],
             ['EVAL_REWARD', '%+.1f'],
             ['EVAL_TASK_DONE', '%-10s', None, TextTable.ALIGN_LEFT],
             ['DURATION', '%.2f s'],
-        ], vline=' '*3)
+        ], vline=' ' * 3)
 
     # noinspection PyMethodMayBeStatic
     def _on_summary(self, info):
@@ -42,8 +42,8 @@ class TrainLogger(Subscriber):
 
     def _on_eval(self, info):
         self._record['EVAL_REWARD'] = info['ave_reward']
-        self._record['EVAL_TASK_DONE'] = '*'*int(10*info['ave_done'])
-        self._record['EVAL_FINAL_STATE'] = self._format_state(info['state'])
+        self._record['EVAL_TASK_DONE'] = '*' * int(10 * info['ave_done'])
+        self._record['EVAL_FINAL_STATE_SAMPLE'] = self._format_state(info['state'])
         self._update_table()
 
     def _update_table(self):
@@ -60,10 +60,10 @@ class TrainLogger(Subscriber):
         return True
 
     def _print_table(self):
-        if len(self._table.records) == 1 or (len(self._table.records)-1) % 30 == 0:
+        if len(self._table.records) == 1 or (len(self._table.records) - 1) % 30 == 0:
             print("\n%s" % self._table.header)
         print(self._table.last_record)
 
     @staticmethod
     def _format_state(state):
-        return "[ %s ]" % ', '.join(['%3d' % c for c in state])
+        return "[%s]" % ','.join(['%+3d' % c if abs(c) > .5 else '  0' for c in state])

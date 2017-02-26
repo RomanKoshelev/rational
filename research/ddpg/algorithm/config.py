@@ -1,10 +1,7 @@
-from .noise_tools import constant_1
-
 config = {
     # actor
     'ddpg.actor_h1': 400,
     'ddpg.actor_h2': 300,
-    'ddpg.actor_l2': 0.0,
     'ddpg.actor_lr': 1e-4,
     'ddpg.actor_tau': 0.001,
 
@@ -25,5 +22,4 @@ config = {
     # noise
     'ddpg.noise_sigma': .5,
     'ddpg.noise_theta': .15,
-    'ddpg.noise_rate_method': constant_1,
 }

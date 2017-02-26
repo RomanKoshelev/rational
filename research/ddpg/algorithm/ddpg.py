@@ -16,7 +16,6 @@ class Ddpg(object):
         self.noise_sigma = config['ddpg.noise_sigma']
         self.buffer_size = config['ddpg.buffer_size']
         self.batch_size = config['ddpg.batch_size']
-        self.noise_rate_method = config['ddpg.noise_rate_method']
 
         self.gamma = config['ddpg.gamma']
         self.world = world
@@ -36,43 +35,31 @@ class Ddpg(object):
         return self.actor.predict([s])[0]
 
     def train(self, episodes, steps):
-        done = False
-        state = None
-
         for e in range(episodes):
-            s = self.world.reset()
-
-            nrate = self.noise_rate_method(e / float(episodes))
+            state = s = self.world.reset()
             reward = 0
+            done = False
             qmax = []
 
             for _ in range(steps):
-                # play
-                a = self.predict(s)
-                a = self._add_noise(a, nrate)
-                s2, r, done = self.world.step(a)
-                self.buffer.add(s, a, r, s2, done)
-                s = s2
+                if not done:
+                    a = self.predict(s)
+                    a = self._add_noise(a, 1.)
+                    s2, r, done = self.world.step(a)
+                    self.buffer.add(s, a, r, s2, done)
+                    state = s = s2
+                    reward += r
 
-                # learn
                 bs, ba, br, bs2, bd = self._get_batch()
                 y = self._make_target(br, bs2, bd)
                 q = self._update_critic(y, bs, ba)
                 self._update_actor(bs)
                 self._update_target_networks()
-
-                # statistic
-                reward += r
                 qmax.append(np.amax(q))
-                state = s
-
-                if done:
-                    break
 
             EventSystem.send('algorithm.train_episode', {
                 'episode': e,
                 'reward': reward,
-                'nrate': nrate,
                 'qmax': np.mean(qmax),
                 'state': state,
                 'done': done

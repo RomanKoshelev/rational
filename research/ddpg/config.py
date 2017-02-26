@@ -7,7 +7,11 @@ from .env.target_world import TargetWorld
 config['algorithm.class'] = Ddpg
 
 # ddpg
-config['ddpg.buffer_size'] = 100 * 1000
+config['ddpg.buffer_size'] = 15 * 1000
+config['ddpg.actor_tau'] = 0.1  # 0.001
+config['ddpg.actor_lr'] = 1e-5  # 1e-4
+config['ddpg.critic_lr'] = 1e-3  # 1e-3
+config['ddpg.critic_tau'] = 0.1  # 0.001
 
 # world
 config['world.class'] = TargetWorld
@@ -22,5 +26,6 @@ config['task.reward_done'] = 1000
 config['task.reward_dist'] = 10
 
 # train
-config['train.episodes'] = 3000
+config['train.episodes'] = 1000
 config['train.steps'] = 10
+

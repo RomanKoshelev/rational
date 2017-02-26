@@ -4,17 +4,16 @@ from .sum_tree import SumTree
 
 
 class ExperienceMemory:
-    e = 0.01
-    a = 0.6
+    epsilon = 1e-5
 
-    def __init__(self, capacity):
+    def __init__(self, capacity, degree):
         self.tree = SumTree(capacity)
+        self.degree = degree
 
     def _get_priority(self, error):
-        return (error + self.e) ** self.a
+        return (error + self.epsilon) ** self.degree
 
     def add(self, error, sample):
-        assert len(sample) == 5  # s,a,r,s2,d
         p = self._get_priority(error)
         self.tree.add(p, sample)
 

@@ -1,5 +1,4 @@
 TODO:
-- fix expl in ddpg
 > PER prioritized expierence replay
 
 LATER:
@@ -14,6 +13,7 @@ LATER:
 ===============================================================
 
 DONE:
++ fix expl in ddpg
 + used random target via task object
 + printed eval final state
 + fixed world.reset error

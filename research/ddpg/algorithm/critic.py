@@ -55,8 +55,7 @@ class CriticNetwork(object):
     def target_train(self):
         self.sess.run(self.target_update)
 
-    def crate_critic_target_network(self, input_dim, action_dim, net) -> (
-            tf.Operation, tf.Operation, tf.Operation, tf.Operation):
+    def crate_critic_target_network(self, input_dim, action_dim, net):
         state = tf.placeholder(tf.float32, shape=[None, input_dim], name='state')
         action = tf.placeholder(tf.float32, shape=[None, action_dim], name='action')
 

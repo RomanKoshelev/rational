@@ -5,7 +5,6 @@ class ActorNetwork(object):
     def __init__(self, config, state_size, action_size):
         self.h1 = config['ddpg.actor_h1']
         self.h2 = config['ddpg.actor_h2']
-        self.l2 = config['ddpg.actor_l2']
         self.lr = config['ddpg.actor_lr']
         self.tau = config['ddpg.actor_tau']
 
@@ -35,8 +34,7 @@ class ActorNetwork(object):
     def target_train(self):
         self.sess.run(self.target_update)
 
-    def crate_actor_target_network(self, input_dim, weights) -> (
-            tf.Operation, tf.Operation, tf.Operation, tf.Operation):
+    def crate_actor_target_network(self, input_dim, weights):
         state = tf.placeholder(tf.float32, shape=[None, input_dim], name='state')
 
         ema = tf.train.ExponentialMovingAverage(decay=1 - self.tau)

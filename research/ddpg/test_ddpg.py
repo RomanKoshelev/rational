@@ -42,10 +42,6 @@ class TestDdpg(unittest.TestCase):
         config['world.dim'] = 3
         self.run_experiment(config)
 
-    def test_world_4d(self):
-        config['world.dim'] = 4
-        self.run_experiment(config)
-
 
 if __name__ == '__main__':
     unittest.main()
