@@ -27,9 +27,6 @@ class TestDdpg(unittest.TestCase):
             self.assertGreater(r, 100)
             self.assertGreater(d, .10)
 
-    def test_default_config(self):
-        self.run_experiment(config)
-
     def test_world_1d(self):
         config['world.dim'] = 1
         self.run_experiment(config)
@@ -40,6 +37,14 @@ class TestDdpg(unittest.TestCase):
 
     def test_world_3d(self):
         config['world.dim'] = 3
+        self.run_experiment(config)
+
+    def test_world_4d(self):
+        config['world.dim'] = 4
+        self.run_experiment(config)
+
+    def test_world_5d(self):
+        config['world.dim'] = 5
         self.run_experiment(config)
 
 
