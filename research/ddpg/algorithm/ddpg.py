@@ -22,6 +22,7 @@ class Ddpg(object):
         self.world = world
         self.buffer = ReplayBuffer(self.buffer_size)
         self.helper = StoreHelper(scope)
+        self.expl = OUNoise(self.world.act_dim, 0, self.noise_sigma, self.noise_theta)
 
         with tf.variable_scope(scope):
             with tf.variable_scope('actor'):
@@ -31,8 +32,10 @@ class Ddpg(object):
 
         self.helper.initialize_variables()
 
+    def predict(self, s):
+        return self.actor.predict([s])[0]
+
     def train(self, episodes, steps):
-        expl = OUNoise(self.world.act_dim, 0, self.noise_sigma, self.noise_theta)
         done = False
         state = None
 
@@ -45,8 +48,8 @@ class Ddpg(object):
 
             for _ in range(steps):
                 # play
-                a = self.actor.predict([s])[0]
-                a = self._add_noise(a, expl.noise(), nrate)
+                a = self.predict(s)
+                a = self._add_noise(a, nrate)
                 s2, r, done = self.world.step(a)
                 self.buffer.add(s, a, r, s2, done)
                 s = s2
@@ -60,7 +63,7 @@ class Ddpg(object):
 
                 # statistic
                 reward += r
-                qmax.append(q)
+                qmax.append(np.amax(q))
                 state = s
 
                 if done:
@@ -99,9 +102,10 @@ class Ddpg(object):
         })
         return reward, done
 
-    @staticmethod
-    def _add_noise(a, n, nr) -> np.ndarray:
-        return (1 - nr) * a + nr * n
+    def _add_noise(self, a, nr) -> np.ndarray:
+        n = self.expl.noise()
+        # return (1 - nr) * a + nr * n
+        return a + nr * n
 
     def _make_target(self, r, s2, done):
         q = self.critic.target_predict(s2, self.actor.target_predict(s2))
@@ -115,7 +119,7 @@ class Ddpg(object):
 
     def _update_critic(self, y, s, a):
         q, _ = self.critic.train(y, s, a)
-        return np.amax(q)
+        return q
 
     def _update_actor(self, s):
         grads = self.critic.gradients(s, self.actor.predict(s))

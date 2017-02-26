@@ -1,5 +1,6 @@
 TODO:
-- PER prioritized expierence replay
+- fix expl in ddpg
+> PER prioritized expierence replay
 
 LATER:
 - add world render

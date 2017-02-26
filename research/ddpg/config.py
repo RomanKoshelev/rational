@@ -1,6 +1,13 @@
 from .algorithm.config import config
+from .algorithm.ddpg import Ddpg
 from .env.target_task import RandomTargetTask
 from .env.target_world import TargetWorld
+
+# algorithm
+config['algorithm.class'] = Ddpg
+
+# ddpg
+config['ddpg.buffer_size'] = 100 * 1000
 
 # world
 config['world.class'] = TargetWorld
