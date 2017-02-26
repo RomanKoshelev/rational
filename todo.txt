@@ -1,7 +1,7 @@
 TODO:
-- compare PER vs Uniform
 
 LATER:
+- add train report
 - add world render
 - add task with sparse reward
 - build train report
@@ -13,6 +13,7 @@ LATER:
 ===============================================================
 
 DONE:
++ compared PER vs Uniform
 + tested ddpg_per with degree > 0
 + refactored train
 + fixed PER error -- add new samples
