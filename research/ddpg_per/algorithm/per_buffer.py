@@ -3,7 +3,7 @@ import numpy as np
 from .sum_tree import SumTree
 
 
-class ExperienceMemory:
+class PerBuffer:
     epsilon = 1e-5
 
     def __init__(self, capacity, degree):

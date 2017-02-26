@@ -2,13 +2,13 @@ import numpy as np
 
 from reinforcement_learning import IWorld
 from research.ddpg.algorithm.ddpg import Ddpg
-from .experience_memory import ExperienceMemory
+from .per_buffer import PerBuffer
 
 
 class DdpgPer(Ddpg):
     def __init__(self, config, world: IWorld, scope=''):
         super().__init__(config, world, scope)
-        self.buffer = ExperienceMemory(self.buffer_size, config['per.degree'])
+        self.buffer = PerBuffer(self.buffer_size, config['per.degree'])
 
     def train(self, episodes, steps):
         self._init_buffer()
