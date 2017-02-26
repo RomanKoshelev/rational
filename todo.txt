@@ -1,5 +1,5 @@
 TODO:
-- test 5d-world
+- ..
 
 LATER:
 - add train report
@@ -14,6 +14,8 @@ LATER:
 ===============================================================
 
 DONE:
++ passed PER test_world_10d
++ tested 5d-world
 + compared PER vs Uniform
 + tested ddpg_per with degree > 0
 + refactored train
