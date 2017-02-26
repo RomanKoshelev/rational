@@ -3,8 +3,6 @@ import unittest
 from research.ddpg.test_ddpg import TestDdpg
 from research.ddpg_per.config import config
 
-config['train.episodes'] = 2000
-
 
 class TestDddpgPer(TestDdpg):
 
