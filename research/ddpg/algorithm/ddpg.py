@@ -80,14 +80,11 @@ class Ddpg(object):
 
     def _learn(self):
         bs, ba, br, bs2, bd = self._get_batch()
-        y = self._make_target(br, bs2, bd)
-        q = self._update_critic(y, bs, ba)
+        t = self._make_target(br, bs2, bd)
+        q = self._update_critic(t, bs, ba)
         self._update_actor(bs)
         self._update_target_networks()
         return q
-
-    def _predict(self, s):
-        return self.actor.predict([s])[0]
 
     def _make_target(self, r, s, done):
         q = self.critic.target_predict(s, self.actor.target_predict(s))
@@ -118,6 +115,9 @@ class Ddpg(object):
 
     def _add_to_buffer(self, s, a, r, s2, done):
         self.buffer.add(s, a, r, s2, done)
+
+    def _predict(self, s):
+        return self.actor.predict([s])[0]
 
     @staticmethod
     def _send_train_event(e, state, reward, done, qmax):
