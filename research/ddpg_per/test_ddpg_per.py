@@ -1,10 +1,10 @@
 import unittest
 
-from research.ddpg.test_ddpg import TestDdpg
+from research.ddpg.testddpg import TestDdpg
 from research.ddpg_per.config import config
 
 
-class TestDddpgPer(TestDdpg):
+class TestDdpgPer(TestDdpg):
 
     def test_default_config(self):
         self.run_experiment(config)
@@ -29,7 +29,7 @@ class TestDddpgPer(TestDdpg):
 
     def test_world_3d(self):
         config['world.dim'] = 3
-        config['per.degree'] = .0  # 0.6
+        config['per.degree'] = .9  # 0.6
         self.run_experiment(config)
 
     def test_world_4d(self):
