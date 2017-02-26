@@ -17,10 +17,13 @@ class DdpgPer(object):
         self.batch_size = config['ddpg.batch_size']
         self.noise_rate_method = config['ddpg.noise_rate_method']
 
+        self.buffer_size = config['ddpg.buffer_size']
+
         self.gamma = config['ddpg.gamma']
         self.world = world
-        self.buffer = ExperienceMemory(config['ddpg.buffer_size'])
+        self.buffer = ExperienceMemory(self.buffer_size)
         self.helper = StoreHelper(scope)
+        self.expl = OUNoise(self.world.act_dim, 0, self.noise_sigma, self.noise_theta)
 
         with tf.variable_scope(scope):
             with tf.variable_scope('actor'):
@@ -30,10 +33,14 @@ class DdpgPer(object):
 
         self.helper.initialize_variables()
 
+    def predict(self, s):
+        return self.actor.predict([s])[0]
+
     def train(self, episodes, steps):
-        expl = OUNoise(self.world.act_dim, 0, self.noise_sigma, self.noise_theta)
         done = False
         state = None
+
+        self._ini_buffer()
 
         for ep in range(episodes):
             s = self.world.reset()
@@ -44,10 +51,8 @@ class DdpgPer(object):
 
             for _ in range(steps):
                 # play
-                a = self.actor.predict([s])[0]
-                a = self._add_noise(a, expl.noise(), nrate)
+                a = self.predict(s) + self.expl.noise()
                 s2, r, done = self.world.step(a)
-                self.buffer.add(r, (s, a, r, s2, done))
                 s = s2
 
                 # learn
@@ -99,10 +104,6 @@ class DdpgPer(object):
         })
         return reward, done
 
-    @staticmethod
-    def _add_noise(a, n, nr) -> np.ndarray:
-        return (1 - nr) * a + nr * n
-
     def _make_target(self, r, s, done):
         q = self.critic.target_predict(s, self.actor.target_predict(s))
         y = []
@@ -126,12 +127,25 @@ class DdpgPer(object):
         self.critic.target_train()
 
     def _get_batch(self):
-        batch = self.buffer.get_batch(self.batch_size)
-        idx, (s, a, r, s2, done) = zip(*batch)
+        res = self.buffer.get_batch(self.batch_size)
+        (idx, samples) = zip(*res)
+        (s, a, r, s2, done) = zip(*samples)
         return idx, s, a, r, s2, done
 
     def _update_buffer(self, idx, q1, q2):
         assert np.shape(q1) == np.shape(q2)
-        err = np.abs(q1-q2)
-        for i in idx:
-            self.buffer.update(i, err[i])
+        err = np.abs(q1 - q2)
+        for i in range(len(err)):
+            self.buffer.update(idx[i], err[i])
+
+    def _ini_buffer(self):
+        s = self.world.reset()
+        for i in range(self.buffer_size):
+            if self.buffer_size > 10000 and i % 1000 == 0:
+                print(i)
+            a = self.predict(s) + self.expl.noise()
+            s2, r, done = self.world.step(a)
+            error = np.abs(r)
+            sample = (s, a, r, s2, done)
+            self.buffer.add(error, sample)
+            s = s2

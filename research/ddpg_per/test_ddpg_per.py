@@ -31,6 +31,7 @@ class TestDddpgPer(unittest.TestCase):
         self.run_experiment(config)
 
     def test_world_2d(self):
+        config['ddpg.buffer_size'] = 10000
         config['train.episodes'] = 500
         config['world.dim'] = 2
         self.run_experiment(config)
