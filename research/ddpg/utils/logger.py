@@ -12,12 +12,12 @@ class TrainLogger(Subscriber):
         self._record = {}
         self._table = TextTable([
             ['EPISODE'],
-            ['FINAL_TRAIN_STATE', '%s', 18],
-            ['REWARD', '%+.1f', 7],
-            ['QMAX', '%+.1f', 7],
-            ['FINAL_EVAL_STATE', '%s', 18],
-            ['EVALUATION', '%+.1f'],
-            ['TASK_DONE', '%s'],
+            # ['TRAIN_FINAL_STATE', '%s', 18],
+            # ['REWARD', '%+.1f', 7],
+            ['TRAIN_Q_MAX', '%+.1f'],
+            ['EVAL_FINAL_STATE', '%s', 18],
+            ['EVAL_REWARD', '%+.1f'],
+            ['EVAL_TASK_DONE', '%-10s', None, TextTable.ALIGN_LEFT],
             ['DURATION', '%.2f s'],
         ], vline=' '*3)
 
@@ -35,15 +35,15 @@ class TrainLogger(Subscriber):
 
     def _on_train(self, info):
         self._record['EPISODE'] = info['episode']
-        self._record['REWARD'] = info['reward']
-        self._record['QMAX'] = info['qmax']
-        self._record['FINAL_TRAIN_STATE'] = self._format_state(info['state'])
+        # self._record['REWARD'] = info['reward']
+        self._record['TRAIN_Q_MAX'] = info['qmax']
+        # self._record['TRAIN_FINAL_STATE'] = self._format_state(info['state'])
         self._update_table()
 
     def _on_eval(self, info):
-        self._record['EVALUATION'] = info['ave_reward']
-        self._record['TASK_DONE'] = 'DONE' if info['ave_done'] > .75 else '%d%%' % (info['ave_done'] * 100)
-        self._record['FINAL_EVAL_STATE'] = self._format_state(info['state'])
+        self._record['EVAL_REWARD'] = info['ave_reward']
+        self._record['EVAL_TASK_DONE'] = '*'*int(10*info['ave_done'])
+        self._record['EVAL_FINAL_STATE'] = self._format_state(info['state'])
         self._update_table()
 
     def _update_table(self):
