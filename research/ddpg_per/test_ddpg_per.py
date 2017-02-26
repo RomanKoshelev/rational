@@ -34,9 +34,9 @@ class TestDdpgPer(TestDdpg):
 
     def test_world_10d(self):
         config['world.dim'] = 10
-        config['ddpg.buffer_size'] = 50 * 1000
         config['train.episodes'] = 3000
-        # config['per.degree'] = 1.2  # 0.6
+        config['ddpg.buffer_size'] = 50 * 1000
+        config['per.degree'] = 1.2  # 0.6
         self.run_experiment(config)
 
 
