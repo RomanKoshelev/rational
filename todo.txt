@@ -1,5 +1,7 @@
 TODO:
-- ..
+- read debugging RL https://jaromiru.com/2016/10/12/lets-make-a-dqn-debugging/
+- implement planning approach
+
 
 LATER:
 - add train report
