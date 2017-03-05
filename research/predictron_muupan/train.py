@@ -85,7 +85,7 @@ def main():
     parser.add_argument('--n-unsupervised-updates', type=int, default=0,
                         help='Number of unsupervised upates per supervised'
                              'updates')
-    parser.add_argument('--gpu', '-g', type=int, default=-1,
+    parser.add_argument('--gpu', '-g', type=int, default=0,
                         help='GPU ID (negative value indicates CPU)')
     parser.add_argument('--out', '-o', default='result',
                         help='Directory to output the result')
