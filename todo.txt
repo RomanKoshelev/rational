@@ -1,5 +1,5 @@
 TODO:
-> explore predictron_zhongwen
+- explore https://github.com/TheAbhiKumar/tensorflow-value-iteration-networks
 
 LATER:
 - try use qmax.append(max(q)) instead of mean(q)
@@ -17,6 +17,7 @@ LATER:
 ===============================================================
 
 DONE:
++ explored predictron_zhongwen
 + passed PER test_world_10d
 + tested 5d-world
 + compared PER vs Uniform
