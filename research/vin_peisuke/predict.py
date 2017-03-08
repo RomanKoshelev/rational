@@ -29,7 +29,7 @@ def get_action(a):
 
 
 def imshow(name, img):
-    path = "imgs/%s.png" % name
+    path = "./imgs/%s.png" % name
     cv2.imwrite(path, img)
     img = mpimg.imread(path)
     plt.imshow(img)
@@ -39,7 +39,7 @@ def waitKey():
     return 100
 
 
-def set_state(im):
+def set_state(im, i):
     mode = 0
     goal = [1, 1]
     pos = [10, 10]
@@ -49,7 +49,7 @@ def set_state(im):
         cv2.rectangle(test_img, tuple(goal), tuple(goal), (0, 0, 1), -1)
         cv2.rectangle(test_img, tuple(pos), tuple(pos), (1, 0, 1), -1)
 
-        imshow("test", cv2.resize(255 - test_img * 255, (300, 300), interpolation=cv2.INTER_NEAREST))
+        imshow("%03d_test" % i, cv2.resize(255 - test_img * 255, (300, 300), interpolation=cv2.INTER_NEAREST))
         mode = 100
 
         # key = cv2.waitKey(0)
@@ -117,7 +117,8 @@ def main():
     model = L.Classifier(VIN(k=20))
     chainer.serializers.load_npz(args.model, model)
 
-    while True:
+    for i in range(2):
+        print(i)
         obs = Obstacle(dom_size, (0, 0), max_obs_size)
         n_obs = obs.add_n_obs(random.randint(0, max_obs))
         if n_obs == 0:
@@ -125,7 +126,7 @@ def main():
         obs.add_border()
 
         im = obs.getimage()
-        pos, goal = set_state(im)
+        pos, goal = set_state(im, i)
 
         if pos is None:
             break
@@ -153,9 +154,9 @@ def main():
             cv2.rectangle(test_img, (s[0], s[1]), (s[0], s[1]), (1, 0, 0), -1)
         cv2.rectangle(test_img, (path[0][0], path[0][1]), (path[0][0], path[0][1]), (0, 1, 1), -1)
         cv2.rectangle(test_img, (goal[0], goal[1]), (goal[0], goal[1]), (0, 0, 1), -1)
-        imshow("image", cv2.resize(255 - test_img * 255, (300, 300), interpolation=cv2.INTER_NEAREST))
-        imshow("reward", cv2.resize(reward, (300, 300), interpolation=cv2.INTER_NEAREST))
-        imshow("value", cv2.resize(value, (300, 300), interpolation=cv2.INTER_NEAREST))
+        imshow("%03d_image" % i, cv2.resize(255 - test_img * 255, (300, 300), interpolation=cv2.INTER_NEAREST))
+        imshow("%03d_reward" % i, cv2.resize(reward, (300, 300), interpolation=cv2.INTER_NEAREST))
+        imshow("%03d_value" % i, cv2.resize(value, (300, 300), interpolation=cv2.INTER_NEAREST))
         # cv2.waitKey(0)
 
 
