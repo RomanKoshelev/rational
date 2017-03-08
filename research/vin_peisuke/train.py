@@ -1,9 +1,9 @@
-from __future__ import print_function
 import argparse
 import pickle
 import numpy as np
 
 import chainer
+# noinspection PyPep8Naming
 import chainer.links as L
 from chainer import training
 from chainer.training import extensions
@@ -38,7 +38,7 @@ def process_map_data(path):
     label_data = data['label']
 
     num = im_data.shape[0]
-    num_train = num - num / 5
+    num_train = num - num // 5
 
     im_train = im_data[0:num_train]
     value_train = value_data[0:num_train]
@@ -56,31 +56,24 @@ def process_map_data(path):
     return train, test
 
 
-class TestModeEvaluator(extensions.Evaluator):
+class RunModeEvaluator(extensions.Evaluator):
     def evaluate(self):
         model = self.get_target('main')
         model.predictor.train = False
-        ret = super(TestModeEvaluator, self).evaluate()
+        ret = super(RunModeEvaluator, self).evaluate()
         model.predictor.train = True
         return ret
 
 
 def main():
     parser = argparse.ArgumentParser(description='VIN')
-    parser.add_argument('--data', '-d', type=str, default='./map_data.pkl',
-                        help='Path to map data generated with script_make_data.py')
-    parser.add_argument('--batchsize', '-b', type=int, default=100,
-                        help='Number of images in each mini-batch')
-    parser.add_argument('--epoch', '-e', type=int, default=30,
-                        help='Number of sweeps over the dataset to train')
-    parser.add_argument('--gpu', '-g', type=int, default=-1,
-                        help='GPU ID (negative value indicates CPU)')
-    parser.add_argument('--out', '-o', default='result',
-                        help='Directory to output the result')
-    parser.add_argument('--resume', '-r', default='',
-                        help='Resume the training from snapshot')
-    parser.add_argument('--unit', '-u', type=int, default=1000,
-                        help='Number of units')
+    parser.add_argument('--data', '-d', type=str, default='./map_data.pkl', help='map data by script_make_data.py')
+    parser.add_argument('--batchsize', '-b', type=int, default=100, help='Number of images in each mini-batch')
+    parser.add_argument('--epoch', '-e', type=int, default=30, help='Number of sweeps over the dataset to train')
+    parser.add_argument('--gpu', '-g', type=int, default=0, help='GPU ID (negative value indicates CPU)')
+    parser.add_argument('--out', '-o', default='result', help='Directory to output the result')
+    parser.add_argument('--resume', '-r', default='', help='Resume the training from snapshot')
+    parser.add_argument('--unit', '-u', type=int, default=1000, help='Number of units')
     args = parser.parse_args()
 
     print('GPU: {}'.format(args.gpu))
@@ -106,7 +99,7 @@ def main():
     # Set up a trainer
     updater = training.StandardUpdater(train_iter, optimizer, device=args.gpu)
     trainer = training.Trainer(updater, (args.epoch, 'epoch'), out=args.out)
-    trainer.extend(TestModeEvaluator(test_iter, model, device=args.gpu))
+    trainer.extend(RunModeEvaluator(test_iter, model, device=args.gpu))
     trainer.extend(extensions.dump_graph('main/loss'))
     trainer.extend(extensions.snapshot(), trigger=(1, 'epoch'))
     trainer.extend(extensions.snapshot_object(model, 'model_iter_{.updater.iteration}'), trigger=(1, 'epoch'))

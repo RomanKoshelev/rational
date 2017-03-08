@@ -1,4 +1,3 @@
-from __future__ import print_function
 import six
 import numpy as np
 
@@ -28,7 +27,7 @@ class VIN(chainer.Chain):
         q = self.conv3(self.r)
         self.v = F.max(q, axis=1, keepdims=True)
 
-        for i in xrange(self.k - 1):
+        for i in range(self.k - 1):
             q = self.conv3(self.r) + self.conv3b(self.v)
             self.v = F.max(q, axis=1, keepdims=True)
 
