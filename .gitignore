@@ -1,6 +1,11 @@
 # IDEs
 .idea/
 
+
+# Results
+chkpts/
+*.pkl
+
 # Native build outputs
 *.slo
 *.lo
@@ -20,7 +25,6 @@
 *.app
 
 # Python stuff
-*.pyc
 *.pyo
 __pycache__
 
