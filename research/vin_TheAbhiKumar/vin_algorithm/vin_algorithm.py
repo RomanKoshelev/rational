@@ -74,6 +74,9 @@ class VinAlgorithm(object):
         cp = tf.cast(tf.argmax(nn, 1), tf.int32)
         self.err = tf.reduce_mean(tf.cast(tf.not_equal(cp, self.y_pl), dtype=tf.float32))
 
+        correct_prediction = tf.cast(tf.argmax(nn, 1), tf.int32)
+        self.accuracy = tf.reduce_mean(tf.cast(tf.equal(correct_prediction, self.y_pl), dtype=tf.float32))
+
         # gridworld data
         self.gridworld_data = process_gridworld_data(input=cfg.input, imsize=cfg.imsize)
 
@@ -108,17 +111,24 @@ class VinAlgorithm(object):
                     err += e
                     cost += c
 
-            EventSystem.send('algorithm.train_epoch', {
+            EventSystem.send('algorithm.train', {
                 'epoch': epoch,
                 'train_cost': cost / num_batches,
                 'train_error': err / num_batches,
             })
 
     def eval(self):
-        pass
-        # x, s1, s2, y, Xtest, S1test, S2test, ytest = self.gridworld_data
-        #
-        # correct_prediction = tf.cast(tf.argmax(nn, 1), tf.int32)
-        # accuracy = tf.reduce_mean(tf.cast(tf.not_equal(correct_prediction, y), dtype=tf.float32))
-        # acc = accuracy.eval({X: Xtest, S1: S1test, S2: S2test, y: ytest})
-        # print("Accuracy: {}%".format(100 * (1 - acc)))
+        _, _, _, _, x, s1, s2, y = self.gridworld_data
+
+        acc = self.accuracy.eval({
+            self.x_pl: x,
+            self.s1_pl: s1,
+            self.s2_pl: s2,
+            self.y_pl: y
+        })
+
+        EventSystem.send('algorithm.eval', {
+            'accuracy': acc,
+        })
+
+        return acc

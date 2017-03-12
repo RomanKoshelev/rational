@@ -4,14 +4,16 @@ from common.text_utils import TextTable
 
 class VinTrainLogger(Subscriber):
     def __init__(self):
-        self._subscribe('algorithm.train_epoch', VinTrainLogger._on_train)
-        self._subscribe('event_timer', VinTrainLogger._on_timer)
+        self._subscribe('algorithm.train', VinTrainLogger._on_train)
+        self._subscribe('algorithm.eval', VinTrainLogger._on_eval)
+        self._subscribe('timer', VinTrainLogger._on_timer)
         self._history = []
         self._record = {}
         self._table = TextTable([
             ['EPOCH'],
             ['TRAIN_COST', '%.3f'],
             ['TRAIN_ERROR', '%.3f'],
+            ['EVAL_ACCURACY', '%.1f%%'],
             ['DURATION', '%.2f s'],
         ], vline=' ' * 3)
 
@@ -23,6 +25,10 @@ class VinTrainLogger(Subscriber):
         self._record['EPOCH'] = info['epoch']
         self._record['TRAIN_COST'] = info['train_cost']
         self._record['TRAIN_ERROR'] = info['train_error']
+        self._update_table()
+
+    def _on_eval(self, info):
+        self._record['EVAL_ACCURACY'] = info['accuracy'] * 100
         self._update_table()
 
     def _update_table(self):

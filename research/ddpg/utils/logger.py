@@ -12,8 +12,6 @@ class TrainLogger(Subscriber):
         self._record = {}
         self._table = TextTable([
             ['EPISODE'],
-            # ['TRAIN_FINAL_STATE', '%s', 18],
-            # ['REWARD', '%+.1f', 7],
             ['TRAIN_Q_MAX', '%+.1f'],
             ['EVAL_FINAL_STATE_SAMPLE', '%s'],
             ['EVAL_REWARD', '%+.1f'],
@@ -35,9 +33,7 @@ class TrainLogger(Subscriber):
 
     def _on_train(self, info):
         self._record['EPISODE'] = info['episode']
-        # self._record['REWARD'] = info['reward']
         self._record['TRAIN_Q_MAX'] = info['qmax']
-        # self._record['TRAIN_FINAL_STATE'] = self._format_state(info['state'])
         self._update_table()
 
     def _on_eval(self, info):

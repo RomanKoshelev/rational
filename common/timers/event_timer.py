@@ -13,7 +13,7 @@ class EventTimer(Subscriber):
         self._add_history(e)
         d = self._get_last_interval(e)
         if d is not None:
-            EventSystem.send('event_timer', {e: d})
+            EventSystem.send('timer', {e: d})
 
     def _add_history(self, e):
         if e not in self.history.keys():
