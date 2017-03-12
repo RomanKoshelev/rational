@@ -1,5 +1,5 @@
 TODO:
-- explore https://github.com/TheAbhiKumar/tensorflow-value-iteration-networks
+> refactore vin_peisuke
 
 LATER:
 - try use qmax.append(max(q)) instead of mean(q)
@@ -17,6 +17,7 @@ LATER:
 ===============================================================
 
 DONE:
++ explored https://github.com/TheAbhiKumar/tensorflow-value-iteration-networks
 + explored predictron_zhongwen
 + passed PER test_world_10d
 + tested 5d-world

@@ -8,7 +8,8 @@ import chainer.links as L
 from chainer import training
 from chainer.training import extensions
 
-from vin import VIN
+from experiment.experiment_data import ExperimentData
+from research.vin_peisuke.algorithm.vin import VIN
 
 
 class MapData(chainer.dataset.DatasetMixin):
@@ -67,7 +68,7 @@ class RunModeEvaluator(extensions.Evaluator):
 
 def main():
     parser = argparse.ArgumentParser(description='VIN')
-    parser.add_argument('--data', '-d', type=str, default='./map_data.pkl', help='map data by script_make_data.py')
+    parser.add_argument('--data', '-d', type=str, default='map/map_data.pkl', help='map data by script_make_data.py')
     parser.add_argument('--batchsize', '-b', type=int, default=100, help='Number of images in each mini-batch')
     parser.add_argument('--epoch', '-e', type=int, default=30, help='Number of sweeps over the dataset to train')
     parser.add_argument('--gpu', '-g', type=int, default=0, help='GPU ID (negative value indicates CPU)')
@@ -75,6 +76,8 @@ def main():
     parser.add_argument('--resume', '-r', default='', help='Resume the training from snapshot')
     parser.add_argument('--unit', '-u', type=int, default=1000, help='Number of units')
     args = parser.parse_args()
+
+    ed = ExperimentData(base_path='./data')
 
     print('GPU: {}'.format(args.gpu))
     print('# unit: {}'.format(args.unit))
@@ -90,7 +93,7 @@ def main():
     optimizer = chainer.optimizers.Adam()
     optimizer.setup(model)
 
-    train, test = process_map_data(args.data)
+    train, test = process_map_data(ed.path(args.data))
 
     train_iter = chainer.iterators.SerialIterator(train, args.batchsize)
     test_iter = chainer.iterators.SerialIterator(test, args.batchsize,

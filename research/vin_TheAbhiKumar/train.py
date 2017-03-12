@@ -10,8 +10,8 @@ from research.vin_TheAbhiKumar.utils import fmt_row
 np.random.seed(0)
 
 # Data
-tf.app.flags.DEFINE_string('input', 'mat_data/gridworld_8.mat', 'Path to data')
-tf.app.flags.DEFINE_integer('imsize', 8, 'Size of input image')
+tf.app.flags.DEFINE_string('input', 'mat_data/gridworld_16.mat', 'Path to data')
+tf.app.flags.DEFINE_integer('imsize', 16, 'Size of input image')
 # Parameters
 tf.app.flags.DEFINE_float('lr', 0.001, 'Learning rate for RMSProp')
 tf.app.flags.DEFINE_integer('epochs', 30, 'Maximum epochs to train for')
@@ -25,7 +25,7 @@ tf.app.flags.DEFINE_integer('statebatchsize', 10,
 tf.app.flags.DEFINE_boolean('untied_weights', False, 'Untie weights of VI network')
 # Misc.
 tf.app.flags.DEFINE_integer('display_step', 1, 'Print summary output every n epochs')
-tf.app.flags.DEFINE_boolean('log', False, 'Enable for tensorboard summary')
+tf.app.flags.DEFINE_boolean('log', True, 'Enable for tensorboard summary')
 tf.app.flags.DEFINE_string('logdir', '/tmp/vintf/', 'Directory to store tensorboard summary')
 
 config = tf.app.flags.FLAGS
