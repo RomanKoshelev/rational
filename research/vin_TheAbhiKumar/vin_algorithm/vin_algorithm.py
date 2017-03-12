@@ -18,12 +18,13 @@ class VinAlgorithm(object):
     def _config(self, cfg):
         # Data
         world_size = cfg['world.size']
+        print(world_size)
         tf.app.flags.DEFINE_string('input', 'mat_data/gridworld_%d.mat' % world_size, 'Path to data')
         tf.app.flags.DEFINE_integer('imsize', world_size, 'Size of input image')
         # Parameters
-        tf.app.flags.DEFINE_float('lr', 0.001, 'Learning rate for RMSProp')
+        tf.app.flags.DEFINE_float('lr', 0.001*3, 'Learning rate for RMSProp')
         tf.app.flags.DEFINE_integer('epochs', cfg['train.epoches'], 'Maximum epochs to train for')
-        tf.app.flags.DEFINE_integer('k', 10, 'Number of value iterations')
+        tf.app.flags.DEFINE_integer('k', world_size+4, 'Number of value iterations')
         tf.app.flags.DEFINE_integer('ch_i', 2, 'Channels in input layer')
         tf.app.flags.DEFINE_integer('ch_h', 150, 'Channels in initial hidden layer')
         tf.app.flags.DEFINE_integer('ch_q', 10, 'Channels in q layer (~actions)')

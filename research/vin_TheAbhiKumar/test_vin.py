@@ -28,12 +28,12 @@ class TestVin(unittest.TestCase):
         self.run_experiment(config)
 
     def test_16x16(self):
-        config['world_size'] = 16
+        config['world.size'] = 16
         config['train.epoches'] = 100
         self.run_experiment(config)
 
     def test_28x28(self):
-        config['world_size'] = 28
+        config['world.size'] = 28
         config['train.epoches'] = 200
         self.run_experiment(config)
 
