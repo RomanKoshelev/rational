@@ -8,20 +8,21 @@ from research.vin_TheAbhiKumar.vin_algorithm.model import VI_Untied_Block, VI_Bl
 
 
 class VinAlgorithm(object):
-    def __init__(self):
+    def __init__(self, cfg):
         np.random.seed(0)
         self.config = None
         self._session = tf.get_default_session()
-        self._config()
+        self._config(cfg)
         self._build()
 
-    def _config(self):
+    def _config(self, cfg):
         # Data
-        tf.app.flags.DEFINE_string('input', 'mat_data/gridworld_8.mat', 'Path to data')
-        tf.app.flags.DEFINE_integer('imsize', 8, 'Size of input image')
+        world_size = cfg['world.size']
+        tf.app.flags.DEFINE_string('input', 'mat_data/gridworld_%d.mat' % world_size, 'Path to data')
+        tf.app.flags.DEFINE_integer('imsize', world_size, 'Size of input image')
         # Parameters
         tf.app.flags.DEFINE_float('lr', 0.001, 'Learning rate for RMSProp')
-        tf.app.flags.DEFINE_integer('epochs', 30, 'Maximum epochs to train for')
+        tf.app.flags.DEFINE_integer('epochs', cfg['train.epoches'], 'Maximum epochs to train for')
         tf.app.flags.DEFINE_integer('k', 10, 'Number of value iterations')
         tf.app.flags.DEFINE_integer('ch_i', 2, 'Channels in input layer')
         tf.app.flags.DEFINE_integer('ch_h', 150, 'Channels in initial hidden layer')

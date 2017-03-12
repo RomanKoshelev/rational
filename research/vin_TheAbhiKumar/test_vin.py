@@ -15,7 +15,7 @@ class TestVin(unittest.TestCase):
     def run_experiment(self, cfg):
         with EventTimer('algorithm.train'), VinTrainLogger(), tf.Session():
             EventSystem.subscribe('algorithm.train', lambda _: alg.eval())
-            alg = VinAlgorithm()
+            alg = VinAlgorithm(cfg)
             alg.train()
 
             acc = alg.eval()
@@ -25,6 +25,16 @@ class TestVin(unittest.TestCase):
             self.assertGreater(acc, .9)
 
     def test_8x8(self):
+        self.run_experiment(config)
+
+    def test_16x16(self):
+        config['world_size'] = 16
+        config['train.epoches'] = 100
+        self.run_experiment(config)
+
+    def test_28x28(self):
+        config['world_size'] = 28
+        config['train.epoches'] = 100
         self.run_experiment(config)
 
 
