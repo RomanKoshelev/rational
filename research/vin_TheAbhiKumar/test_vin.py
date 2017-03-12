@@ -20,7 +20,7 @@ class TestVin(unittest.TestCase):
 
             acc = alg.eval()
             EventSystem.send('train.summary', ["\n", "-" * 32, fields([
-                ['Accuracy', "%.2f" % acc],
+                ['Accuracy', "%.2f%%" % (acc*100)],
             ], -6)])
             self.assertGreater(acc, .9)
 
