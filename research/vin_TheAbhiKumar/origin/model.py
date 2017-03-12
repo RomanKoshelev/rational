@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
-from research.vin_TheAbhiKumar.utils import flipkernel
+
+from research.vin_TheAbhiKumar.origin.utils import flipkernel
 
 
 def conv2d_flipkernel(x, k, name=None):
