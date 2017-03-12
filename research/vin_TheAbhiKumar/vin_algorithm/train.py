@@ -1,11 +1,13 @@
-import time
+# import time
 
 import numpy as np
 import tensorflow as tf
-from .data import process_gridworld_data
-from .utils import fmt_row
 
-from research.vin_TheAbhiKumar.origin.model import VI_Untied_Block, VI_Block
+from common.events import EventSystem
+from .data import process_gridworld_data
+# from .utils import fmt_row
+
+from research.vin_TheAbhiKumar.vin_algorithm.model import VI_Untied_Block, VI_Block
 
 
 def train():
@@ -29,6 +31,7 @@ def train():
     tf.app.flags.DEFINE_boolean('log', True, 'Enable for tensorboard summary')
     tf.app.flags.DEFINE_string('logdir', '/tmp/vintf/', 'Directory to store tensorboard summary')
     config = tf.app.flags.FLAGS
+
     # symbolic input image tensor where typically first channel is image, second is the reward prior
     X = tf.placeholder(tf.float32, name="X", shape=[None, config.imsize, config.imsize, config.ch_i])
     # symbolic input batches of vertical positions
@@ -64,20 +67,12 @@ def train():
                                                                                             imsize=config.imsize)
     # Launch the graph
     with tf.Session() as sess:
-        if config.log:
-            for var in tf.trainable_variables():
-                tf.summary.histogram(var.op.name, var)
-            summary_op = tf.summary.merge_all()
-            summary_writer = tf.summary.FileWriter(config.logdir, sess.graph)
-        else:
-            summary_op = None
-            summary_writer = None
         sess.run(init)
 
         batch_size = config.batchsize
-        print(fmt_row(10, ["Epoch", "Train Cost", "Train Err", "Epoch Time"]))
+        # print(fmt_row(10, ["Epoch", "Train Cost", "Train Err", "Epoch Time"]))
         for epoch in range(int(config.epochs)):
-            tstart = time.time()
+            # tstart = time.time()
             avg_err, avg_cost = 0.0, 0.0
             num_batches = int(Xtrain.shape[0] / batch_size)
             # Loop over all batches
@@ -90,21 +85,17 @@ def train():
                     _, e_, c_ = sess.run([optimizer, err, cost], feed_dict=fd)
                     avg_err += e_
                     avg_cost += c_
-            # Display logs per epoch step
-            if epoch % config.display_step == 0:
-                elapsed = time.time() - tstart
-                print(fmt_row(10, [epoch, avg_cost / num_batches, avg_err / num_batches, elapsed]))
-            if config.log:
-                summary = tf.Summary()
-                summary.ParseFromString(sess.run(summary_op))
-                summary.value.add(tag='Average error', simple_value=float(avg_err / num_batches))
-                summary.value.add(tag='Average cost', simple_value=float(avg_cost / num_batches))
-                summary_writer.add_summary(summary, epoch)
-        print("Finished training!")
 
-        # Test model
-        correct_prediction = tf.cast(tf.argmax(nn, 1), tf.int32)
-        # Calculate accuracy
-        accuracy = tf.reduce_mean(tf.cast(tf.not_equal(correct_prediction, y), dtype=tf.float32))
-        acc = accuracy.eval({X: Xtest, S1: S1test, S2: S2test, y: ytest})
-        print("Accuracy: {}%".format(100 * (1 - acc)))
+            EventSystem.send('algorithm.train_epoch', {
+                'epoch': epoch,
+                'train_cost': avg_cost / num_batches,
+                'train_error': avg_err / num_batches,
+            })
+
+
+def evaluate():
+    pass
+    # correct_prediction = tf.cast(tf.argmax(nn, 1), tf.int32)
+    # accuracy = tf.reduce_mean(tf.cast(tf.not_equal(correct_prediction, y), dtype=tf.float32))
+    # acc = accuracy.eval({X: Xtest, S1: S1test, S2: S2test, y: ytest})
+    # print("Accuracy: {}%".format(100 * (1 - acc)))

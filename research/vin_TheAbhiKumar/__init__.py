@@ -1,1 +1,1 @@
-from research.vin_TheAbhiKumar.origin import data
+from research.vin_TheAbhiKumar.vin_algorithm import data
