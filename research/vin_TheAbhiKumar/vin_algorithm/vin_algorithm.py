@@ -8,12 +8,14 @@ from research.vin_TheAbhiKumar.vin_algorithm.model import VI_Untied_Block, VI_Bl
 
 
 class VinAlgorithm(object):
-
     def __init__(self):
-        pass
-
-    def train(self):
         np.random.seed(0)
+        self.config = None
+        self._session = tf.get_default_session()
+        self._config()
+        self._build()
+
+    def _config(self):
         # Data
         tf.app.flags.DEFINE_string('input', 'mat_data/gridworld_8.mat', 'Path to data')
         tf.app.flags.DEFINE_integer('imsize', 8, 'Size of input image')
@@ -32,71 +34,90 @@ class VinAlgorithm(object):
         tf.app.flags.DEFINE_integer('display_step', 1, 'Print summary output every n epochs')
         tf.app.flags.DEFINE_boolean('log', True, 'Enable for tensorboard summary')
         tf.app.flags.DEFINE_string('logdir', '/tmp/vintf/', 'Directory to store tensorboard summary')
-        config = tf.app.flags.FLAGS
+        self.config = tf.app.flags.FLAGS
+
+    def _build(self):
+        cfg = self.config
 
         # symbolic input image tensor where typically first channel is image, second is the reward prior
-        X = tf.placeholder(tf.float32, name="X", shape=[None, config.imsize, config.imsize, config.ch_i])
+        self.x_pl = tf.placeholder(tf.float32, name="x", shape=[None, cfg.imsize, cfg.imsize, cfg.ch_i])
+
         # symbolic input batches of vertical positions
-        S1 = tf.placeholder(tf.int32, name="S1", shape=[None, config.statebatchsize])
+        self.s1_pl = tf.placeholder(tf.int32, name="s1", shape=[None, cfg.statebatchsize])
+
         # symbolic input batches of horizontal positions
-        S2 = tf.placeholder(tf.int32, name="S2", shape=[None, config.statebatchsize])
-        y = tf.placeholder(tf.int32, name="y", shape=[None])
+        self.s2_pl = tf.placeholder(tf.int32, name="s2", shape=[None, cfg.statebatchsize])
+
+        self.y_pl = tf.placeholder(tf.int32, name="y", shape=[None])
+
         # Construct model (Value Iteration Network)
-        if config.untied_weights:
-            logits, nn = VI_Untied_Block(X, S1, S2, config)
+        if cfg.untied_weights:
+            logits, nn = VI_Untied_Block(self.x_pl, self.s1_pl, self.s2_pl, cfg)
         else:
-            logits, nn = VI_Block(X, S1, S2, config)
+            logits, nn = VI_Block(self.x_pl, self.s1_pl, self.s2_pl, cfg)
 
         # Define loss and optimizer
         # use sparse_softmax_cross_entropy_with_logits replacing log(nn)
-        y_ = tf.cast(y, tf.int64)
-        cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(
-            logits, y_, name='cross_entropy')
+        y_ = tf.cast(self.y_pl, tf.int64)
+        cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits, y_, name='cross_entropy')
         cross_entropy_mean = tf.reduce_mean(cross_entropy, name='cross_entropy_mean')
         tf.add_to_collection('losses', cross_entropy_mean)
-        cost = tf.add_n(tf.get_collection('losses'), name='total_loss')
+        self.cost = tf.add_n(tf.get_collection('losses'), name='total_loss')
+
         # dim = tf.shape(y)[0]
         # cost_idx = tf.concat(1, [tf.reshape(tf.range(dim), [dim,1]), tf.reshape(y, [dim,1])])
         # cost = -tf.reduce_mean(tf.gather_nd(tf.log(nn), [cost_idx]))
-        optimizer = tf.train.RMSPropOptimizer(learning_rate=config.lr, epsilon=1e-6, centered=True).minimize(cost)
+        self.optimizer = tf.train.RMSPropOptimizer(learning_rate=cfg.lr, epsilon=1e-6, centered=True).minimize(
+            self.cost)
+
         # Test model & calculate accuracy
         cp = tf.cast(tf.argmax(nn, 1), tf.int32)
-        err = tf.reduce_mean(tf.cast(tf.not_equal(cp, y), dtype=tf.float32))
+        self.err = tf.reduce_mean(tf.cast(tf.not_equal(cp, self.y_pl), dtype=tf.float32))
+
+        # gridworld data
+        self.gridworld_data = process_gridworld_data(input=cfg.input, imsize=cfg.imsize)
+
         # Initializing the variables
-        init = tf.global_variables_initializer()
-        saver = tf.train.Saver()
-        Xtrain, S1train, S2train, ytrain, Xtest, S1test, S2test, ytest = process_gridworld_data(input=config.input,
-                                                                                                imsize=config.imsize)
-        # Launch the graph
-        with tf.Session() as sess:
-            sess.run(init)
+        self.init = tf.global_variables_initializer()
 
-            batch_size = config.batchsize
-            # print(fmt_row(10, ["Epoch", "Train Cost", "Train Err", "Epoch Time"]))
-            for epoch in range(int(config.epochs)):
-                # tstart = time.time()
-                avg_err, avg_cost = 0.0, 0.0
-                num_batches = int(Xtrain.shape[0] / batch_size)
-                # Loop over all batches
-                for i in range(0, Xtrain.shape[0], batch_size):
-                    j = i + batch_size
-                    if j <= Xtrain.shape[0]:
-                        # Run optimization op (backprop) and cost op (to get loss value)
-                        fd = {X: Xtrain[i:j], S1: S1train[i:j], S2: S2train[i:j],
-                              y: ytrain[i * config.statebatchsize:j * config.statebatchsize]}
-                        _, e_, c_ = sess.run([optimizer, err, cost], feed_dict=fd)
-                        avg_err += e_
-                        avg_cost += c_
+        self._session.run(self.init)
 
-                EventSystem.send('algorithm.train_epoch', {
-                    'epoch': epoch,
-                    'train_cost': avg_cost / num_batches,
-                    'train_error': avg_err / num_batches,
-                })
+    def train(self):
+        cfg = self.config
 
+        batch_size = cfg.batchsize
+
+        x, s1, s2, y, _, _, _, _ = self.gridworld_data
+
+        for epoch in range(int(cfg.epochs)):
+
+            err, cost = 0.0, 0.0
+            num_batches = int(x.shape[0] / batch_size)
+
+            for i in range(0, x.shape[0], batch_size):
+                j = i + batch_size
+                if j <= x.shape[0]:
+                    feeder = {
+                        self.x_pl: x[i:j],
+                        self.s1_pl: s1[i:j],
+                        self.s2_pl: s2[i:j],
+                        self.y_pl: y[i * cfg.statebatchsize:j * cfg.statebatchsize]
+                    }
+
+                    _, c, e = self._session.run([self.optimizer, self.cost, self.err], feed_dict=feeder)
+                    err += e
+                    cost += c
+
+            EventSystem.send('algorithm.train_epoch', {
+                'epoch': epoch,
+                'train_cost': cost / num_batches,
+                'train_error': err / num_batches,
+            })
 
     def eval(self):
         pass
+        # x, s1, s2, y, Xtest, S1test, S2test, ytest = self.gridworld_data
+        #
         # correct_prediction = tf.cast(tf.argmax(nn, 1), tf.int32)
         # accuracy = tf.reduce_mean(tf.cast(tf.not_equal(correct_prediction, y), dtype=tf.float32))
         # acc = accuracy.eval({X: Xtest, S1: S1test, S2: S2test, y: ytest})

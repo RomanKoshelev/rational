@@ -1,4 +1,5 @@
 import unittest
+import tensorflow as tf
 
 from common.timers.event_timer import EventTimer
 from research.vin_TheAbhiKumar.config import config
@@ -10,7 +11,7 @@ class TestVin(unittest.TestCase):
 
     # noinspection PyMethodMayBeStatic
     def run_experiment(self, cfg):
-        with EventTimer('algorithm.train_epoch'), VinTrainLogger():
+        with EventTimer('algorithm.train_epoch'), VinTrainLogger(), tf.Session():
             alg = VinAlgorithm()
             alg.train()
 
