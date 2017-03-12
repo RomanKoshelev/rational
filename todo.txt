@@ -1,9 +1,9 @@
 TODO:
 > refactore vin_TheAbhiKumar
 - draw eval results
+- combine vin and ddpg
 
 LATER:
-- try use qmax.append(max(q)) instead of mean(q)
 - read debugging RL https://jaromiru.com/2016/10/12/lets-make-a-dqn-debugging/
 - implement planning approach
 - add train report
