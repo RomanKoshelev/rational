@@ -29,7 +29,9 @@ class TestVin(unittest.TestCase):
 
     def test_16x16(self):
         config['world.size'] = 16
-        config['train.epoches'] = 100
+        config['train.learning_rate'] = 0.001
+        config['train.epoches'] = 300
+        config['train.batch_size'] = 256
         self.run_experiment(config)
 
     def test_28x28(self):
