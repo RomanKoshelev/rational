@@ -30,10 +30,6 @@ class VinAlgorithm(object):
         tf.app.flags.DEFINE_integer('statebatchsize', 10,
                                     'Number of state inputs for each sample (real number, technically is k+1)')
         tf.app.flags.DEFINE_boolean('untied_weights', False, 'Untie weights of VI network')
-        # Misc.
-        tf.app.flags.DEFINE_integer('display_step', 1, 'Print summary output every n epochs')
-        tf.app.flags.DEFINE_boolean('log', True, 'Enable for tensorboard summary')
-        tf.app.flags.DEFINE_string('logdir', '/tmp/vintf/', 'Directory to store tensorboard summary')
         self.config = tf.app.flags.FLAGS
 
     def _build(self):

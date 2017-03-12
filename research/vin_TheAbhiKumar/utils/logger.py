@@ -6,6 +6,7 @@ class VinTrainLogger(Subscriber):
     def __init__(self):
         self._subscribe('algorithm.train', VinTrainLogger._on_train)
         self._subscribe('algorithm.eval', VinTrainLogger._on_eval)
+        self._subscribe('train.summary', VinTrainLogger._on_summary)
         self._subscribe('timer', VinTrainLogger._on_timer)
         self._history = []
         self._record = {}
@@ -48,3 +49,11 @@ class VinTrainLogger(Subscriber):
         if len(self._table.records) == 1 or (len(self._table.records) - 1) % 30 == 0:
             print("\n%s" % self._table.header)
         print(self._table.last_record)
+
+    # noinspection PyMethodMayBeStatic
+    def _on_summary(self, info):
+        if isinstance(info, (list, tuple)):
+            for i in info:
+                print(str(i))
+        else:
+            print(info)
